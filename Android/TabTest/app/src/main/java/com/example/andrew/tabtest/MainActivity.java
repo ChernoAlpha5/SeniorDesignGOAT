@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     ViewPager viewPager;
     ViewPagerAdapter viewPagerAdapter;
     TextView hydrationLvl;
+    LineChart hydratePlot;
     ArrayList<Integer> LThydration = new ArrayList<Integer>();  //LThydration = "long-term hydration"
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         tabLayout = (TabLayout)findViewById(R.id.tabLayout);
         viewPager = (ViewPager)findViewById(R.id.viewPager);
+        hydratePlot = (LineChart)findViewById(R.id.hydrateChart);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         viewPagerAdapter.addFragments(new HomeFragment(), "Hydration");
         viewPagerAdapter.addFragments(new TopFreeFragment(), "Respiration");
@@ -38,7 +42,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** Called when the user clicks the Send button. Must be public and void
-     * Displays what the user entered into the edit_message widget*/
+     * Displays what the user entered into the edit_message widget
+     * TODO: perhaps place this in the home fragment java file?
+     * */
     public void hydrateDispMsg(View view){
         EditText editText = (EditText) findViewById(R.id.edit_message);
         String message = editText.getText().toString();
