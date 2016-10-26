@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     /** Called when the user clicks the Send button. Must be public and void
      * Displays what the user entered into the edit_message widget*/
-    public void dispMessage(View view){
+    public void hydrateDispMsg(View view){
         EditText editText = (EditText) findViewById(R.id.edit_message);
         String message = editText.getText().toString();
         try{
