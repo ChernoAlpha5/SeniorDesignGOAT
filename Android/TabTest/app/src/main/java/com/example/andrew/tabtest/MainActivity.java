@@ -1,5 +1,6 @@
 package com.example.andrew.tabtest;
 
+import android.graphics.Color;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -21,43 +25,29 @@ public class MainActivity extends AppCompatActivity {
     TabLayout tabLayout;
     ViewPager viewPager;
     ViewPagerAdapter viewPagerAdapter;
-    TextView hydrationLvl;
-    LineChart hydratePlot;
-    ArrayList<Integer> LThydration = new ArrayList<Integer>();  //LThydration = "long-term hydration"
+
+
+    // hydration plot variables
+   // LineChart chart;
+    //LineData hLineData;
+    //ArrayList<Integer> LThydration = new ArrayList<Integer>();  //LThydration = "long-term hydration"
+    ArrayList<String> hXAXES = new ArrayList<String>();
+    ArrayList<Entry> hYAXES = new ArrayList<Entry>();
+    double startTime = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         toolbar = (Toolbar)findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
         tabLayout = (TabLayout)findViewById(R.id.tabLayout);
         viewPager = (ViewPager)findViewById(R.id.viewPager);
-        hydratePlot = (LineChart)findViewById(R.id.hydrateChart);
+        //chart = (LineChart) findViewById(R.id.hydrateChart);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         viewPagerAdapter.addFragments(new HomeFragment(), "Hydration");
         viewPagerAdapter.addFragments(new TopFreeFragment(), "Respiration");
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
-    }
 
-    /** Called when the user clicks the Send button. Must be public and void
-     * Displays what the user entered into the edit_message widget
-     * TODO: perhaps place this in the home fragment java file?
-     * */
-    public void hydrateDispMsg(View view){
-        EditText editText = (EditText) findViewById(R.id.edit_message);
-        String message = editText.getText().toString();
-        try{
-            Integer intHydrateLvl = Integer.parseInt(message);
-            DateFormat df = new SimpleDateFormat("EEE, d MMM, HH:mm");
-            String mydate = df.format(Calendar.getInstance().getTime());
-            hydrationLvl = (TextView)findViewById(R.id.hydrationLvl);
-            hydrationLvl.setText(intHydrateLvl  + "% as of " + mydate);
-            LThydration.add(intHydrateLvl);
-        }
-        catch(NumberFormatException e){
-            hydrationLvl.setText("Invalid entry");
-        }
     }
 }

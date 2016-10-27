@@ -1,0 +1,45 @@
+    private void initHPlot(){
+        /*ArrayList<LineDataSet> LineSets = new ArrayList<LineDataSet>();
+        hYAXES.add(new Entry(0,0f));
+        hYAXES.add(new Entry(5,5f));
+        String[] strXAXES = (String[])hXAXES.toArray(new String[0]);
+
+        LineDataSet hDataSet = new LineDataSet(hYAXES,"hydration level");
+        hLineData = new LineData(hDataSet);
+        hDataSet.setDrawCircles(false);
+        hDataSet.setColor(Color.RED);
+        LineSets.add(hDataSet);
+
+        hydratePlot.setData(hLineData);*/
+
+        /*hydratePlot = (LineChart)findViewById(R.id.hydrateChart);
+        ArrayList<Entry> entries = new ArrayList<>();
+        entries.add(new Entry(0, 4f));
+        entries.add(new Entry(1, 8f));
+        entries.add(new Entry(2, 6f));
+        entries.add(new Entry(3, 2f));
+        entries.add(new Entry(4, 18f));
+        entries.add(new Entry(5, 9f));
+        String[] test1= {"hello", "darkness"};
+        LineDataSet dataSet = new LineDataSet(entries, "# of Calls");
+        LineData lineData = new LineData(dataSet);
+
+        hydratePlot.setData(lineData);
+        hydratePlot.invalidate(); //refresh
+        hydratePlot.setVisibleXRangeMinimum(65f); */
+
+        // in this example, a LineChart is initialized from xml
+
+        entries = new ArrayList<>();
+        entries.add(new Entry(0, 0f));
+        /*entries.add(new Entry(1, 8f));
+        entries.add(new Entry(2, 6f));
+        entries.add(new Entry(3, 2f));
+        entries.add(new Entry(4, 18f));
+        entries.add(new Entry(5, 9f));*/
+        LineDataSet dataSet = new LineDataSet(entries, "Hydration Level"); // add entries to dataset
+        dataSet.setColor(Color.RED);
+        LineData lineData = new LineData(dataSet);
+        hydrateChart.setData(lineData);
+        hydrateChart.invalidate(); // refresh
+    }
