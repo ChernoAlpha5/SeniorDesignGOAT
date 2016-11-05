@@ -92,6 +92,12 @@ void error(const __FlashStringHelper*err) {
             automatically on startup)
 */
 /**************************************************************************/
+
+// sin wave points (16 points, max amplitude = 100, min amplitude = 0)
+int sinWave[]  = {50,69,85,96,100,96,85,69,50,31,15,4,0,4,15,31};
+int sinLen = 16;
+int sinInd;
+
 void setup(void)
 {
   while (!Serial);  // required for Flora & Micro
@@ -146,6 +152,7 @@ void setup(void)
     ble.sendCommandCheckOK("AT+HWModeLED=" MODE_LED_BEHAVIOUR);
     Serial.println(F("******************************"));
   }
+  sinInd = 0;
 }
 
 /**************************************************************************/
@@ -156,10 +163,22 @@ void setup(void)
 void loop(void)
 {
   // Check for user input
-  char inputs[BUFSIZE+1];
-  String strInputs = inputs;
+  //char inputs[BUFSIZE+1];
   
-  if ( getUserInput(inputs, BUFSIZE) )
+  String dataPt = String(sinWave[sinInd]);
+  sinInd = (sinInd + 1) % sinLen;
+  Serial.print("[Send] ");
+  Serial.println(dataPt);
+  ble.print("AT+BLEUARTTX=");
+  ble.println(dataPt + ", ");
+  
+   // check response status
+  if (! ble.waitForOK() ) {
+      Serial.println(F("Failed to send?"));
+  }
+  delay(500);
+  
+  /*if ( getUserInput(inputs, BUFSIZE) )
   {
     // Send characters to Bluefruit
     Serial.print("[Send] ");
@@ -172,7 +191,7 @@ void loop(void)
     if (! ble.waitForOK() ) {
       Serial.println(F("Failed to send?"));
     }
-  }
+  } */
 
   // Check for incoming characters from Bluefruit
   ble.println("AT+BLEUARTRX");

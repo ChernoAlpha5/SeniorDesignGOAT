@@ -12,9 +12,29 @@
  any redistribution
 *********************************************************************/
 
+/*
+  This example shows how to send HID Consumer Control Keys,
+  ncluding the following control key definitions:
+
+  System Control (works on most systems: Windows/OS X/Android/iOS)
+    - Sound Mute
+    - Brightness Increase, decrease
+  Media Control (works on most systems)
+    - PlayPause
+    - MediaNext
+  Application Launchers (works mainly on Windows 8/10)
+    - EmailReader
+    - Calculator
+  Browser Specific (Firefox, file explorer: mainly on Windows 8/10)
+    - Back
+    - Forward
+    - Refresh
+    - Search
+*/
+
 #include <Arduino.h>
 #include <SPI.h>
-#if not defined (_VARIANT_ARDUINO_DUE_X_) && not defined (_VARIANT_ARDUINO_ZERO_)
+#if not defined (_VARIANT_ARDUINO_DUE_X_) && not defined(ARDUINO_ARCH_SAMD)
   #include <SoftwareSerial.h>
 #endif
 
@@ -23,6 +43,7 @@
 #include "Adafruit_BluefruitLE_UART.h"
 
 #include "BluefruitConfig.h"
+
 
 /*=========================================================================
     APPLICATION SETTINGS
@@ -51,14 +72,11 @@
                               bonding data stored on the chip, meaning the
                               central device won't be able to reconnect.
     MINIMUM_FIRMWARE_VERSION  Minimum firmware version to have some new features
-    MODE_LED_BEHAVIOUR        LED activity, valid options are
-                              "DISABLE" or "MODE" or "BLEUART" or
-                              "HWUART"  or "SPI"  or "MANUAL"
     -----------------------------------------------------------------------*/
-    #define FACTORYRESET_ENABLE         1
+    #define FACTORYRESET_ENABLE         0
     #define MINIMUM_FIRMWARE_VERSION    "0.6.6"
-    #define MODE_LED_BEHAVIOUR          "MODE"
 /*=========================================================================*/
+
 
 // Create the bluefruit object, either software serial...uncomment these lines
 /*
@@ -69,16 +87,15 @@ Adafruit_BluefruitLE_UART ble(bluefruitSS, BLUEFRUIT_UART_MODE_PIN,
 */
 
 /* ...or hardware serial, which does not need the RTS/CTS pins. Uncomment this line */
-// Adafruit_BluefruitLE_UART ble(Serial1, BLUEFRUIT_UART_MODE_PIN);
+// Adafruit_BluefruitLE_UART ble(BLUEFRUIT_HWSERIAL_NAME, BLUEFRUIT_UART_MODE_PIN);
 
 /* ...hardware SPI, using SCK/MOSI/MISO hardware SPI pins and then user selected CS/IRQ/RST */
-//Adafruit_BluefruitLE_SPI ble(BLUEFRUIT_SPI_CS, BLUEFRUIT_SPI_IRQ, BLUEFRUIT_SPI_RST);
+Adafruit_BluefruitLE_SPI ble(BLUEFRUIT_SPI_CS, BLUEFRUIT_SPI_IRQ, BLUEFRUIT_SPI_RST);
 
 /* ...software SPI, using SCK/MOSI/MISO user-defined SPI pins and then user selected CS/IRQ/RST */
-Adafruit_BluefruitLE_SPI ble(BLUEFRUIT_SPI_SCK, BLUEFRUIT_SPI_MISO,
-                             BLUEFRUIT_SPI_MOSI, BLUEFRUIT_SPI_CS,
-                             BLUEFRUIT_SPI_IRQ, BLUEFRUIT_SPI_RST);
-
+//Adafruit_BluefruitLE_SPI ble(BLUEFRUIT_SPI_SCK, BLUEFRUIT_SPI_MISO,
+//                             BLUEFRUIT_SPI_MOSI, BLUEFRUIT_SPI_CS,
+//                             BLUEFRUIT_SPI_IRQ, BLUEFRUIT_SPI_RST);
 
 // A small helper
 void error(const __FlashStringHelper*err) {
@@ -94,11 +111,11 @@ void error(const __FlashStringHelper*err) {
 /**************************************************************************/
 void setup(void)
 {
-  while (!Serial);  // required for Flora & Micro
+  while (!Serial);  // Required for Flora & Micro
   delay(500);
 
   Serial.begin(115200);
-  Serial.println(F("Adafruit Bluefruit Command Mode Example"));
+  Serial.println(F("Adafruit Bluefruit HID Control Key Example"));
   Serial.println(F("---------------------------------------"));
 
   /* Initialise the module */
@@ -115,7 +132,7 @@ void setup(void)
     /* Perform a factory reset to make sure everything is in a known state */
     Serial.println(F("Performing a factory reset: "));
     if ( ! ble.factoryReset() ){
-      error(F("Couldn't factory reset"));
+      error(F("Factory reset failed!"));
     }
   }
 
@@ -126,26 +143,36 @@ void setup(void)
   /* Print Bluefruit information */
   ble.info();
 
-  Serial.println(F("Please use Adafruit Bluefruit LE app to connect in UART mode"));
-  Serial.println(F("Then Enter characters to send to Bluefruit"));
-  Serial.println();
-
-  ble.verbose(false);  // debug info is a little annoying after this point!
-
-  /* Wait for connection */
-  while (! ble.isConnected()) {
-      delay(500);
-  }
-
-  // LED Activity command is only supported from 0.6.6
-  if ( ble.isVersionAtLeast(MINIMUM_FIRMWARE_VERSION) )
+  // This demo only works with firmware 0.6.6 and higher!
+  // Request the Bluefruit firmware rev and check if it is valid
+  if ( !ble.isVersionAtLeast(MINIMUM_FIRMWARE_VERSION) )
   {
-    // Change Mode LED Activity
-    Serial.println(F("******************************"));
-    Serial.println(F("Change LED activity to " MODE_LED_BEHAVIOUR));
-    ble.sendCommandCheckOK("AT+HWModeLED=" MODE_LED_BEHAVIOUR);
-    Serial.println(F("******************************"));
+    error(F("This sketch requires firmware version " MINIMUM_FIRMWARE_VERSION " or higher!"));
   }
+
+  /* Enable HID Service */
+  Serial.println(F("Enable HID Services (including Control Key): "));
+  if (! ble.sendCommandCheckOK(F( "AT+BLEHIDEN=On"  ))) {
+    error(F("Failed to enable HID (firmware >=0.6.6?)"));
+  }
+
+  /* Adding or removing services requires a reset */
+  Serial.println(F("Performing a SW reset (service changes require a reset): "));
+  if (! ble.reset() ) {
+    error(F("Couldn't reset??"));
+  }
+
+  Serial.println();
+  Serial.println(F("**********************************************************"));
+  Serial.println(F("Go to your phone's Bluetooth settings to pair your device"));
+  Serial.println(F("Some Control Key works system-wide: mute, brightness ..."));
+  Serial.println(F("Some are application specific: Media play/pause"));
+  Serial.println(F("**********************************************************"));
+
+  // Print pre-defined control keys
+  printDefinedControlKey();
+
+  Serial.println();
 }
 
 /**************************************************************************/
@@ -155,35 +182,33 @@ void setup(void)
 /**************************************************************************/
 void loop(void)
 {
-  // Check for user input
-  char inputs[BUFSIZE+1];
-  String strInputs = inputs;
-  
-  if ( getUserInput(inputs, BUFSIZE) )
+  // Display prompt
+  Serial.print(F("Control (? for help) > "));
+
+  // Check for user input and echo it back if anything was found
+  char keys[BUFSIZE+1];
+  getUserInput(keys, BUFSIZE);
+
+  Serial.println(keys);
+
+  if ( keys[0] == '?')
   {
-    // Send characters to Bluefruit
-    Serial.print("[Send] ");
-    Serial.println(inputs);
+    printDefinedControlKey();
+  }else
+  {
+    ble.print("AT+BleHidControlKey=");
+    ble.println(keys);
 
-    ble.print("AT+BLEUARTTX=");
-    ble.println(inputs);
-
-    // check response stastus
-    if (! ble.waitForOK() ) {
-      Serial.println(F("Failed to send?"));
+    if( ble.waitForOK() )
+    {
+      Serial.println( F("OK!") );
+    }else
+    {
+      Serial.println( F("FAILED!") );
+      // Failed, probably pairing is not complete yet
+      Serial.println( F("Please make sure Bluefruit is paired and try again") );
     }
   }
-
-  // Check for incoming characters from Bluefruit
-  ble.println("AT+BLEUARTRX");
-  ble.readline();
-  if (strcmp(ble.buffer, "OK") == 0) {
-    // no data
-    return;
-  }
-  // Some data was found, its in the buffer
-  Serial.print(F("[Recv] ")); Serial.println(ble.buffer);
-  ble.waitForOK();
 }
 
 /**************************************************************************/
@@ -191,23 +216,61 @@ void loop(void)
     @brief  Checks for user input (via the Serial Monitor)
 */
 /**************************************************************************/
-bool getUserInput(char buffer[], uint8_t maxSize)
+void getUserInput(char buffer[], uint8_t maxSize)
 {
-  // timeout in 100 milliseconds
-  TimeoutTimer timeout(100);
-
   memset(buffer, 0, maxSize);
-  while( (!Serial.available()) && !timeout.expired() ) { delay(1); }
+  while( Serial.available() == 0 ) {
+    delay(1);
+  }
 
-  if ( timeout.expired() ) return false;
-
-  delay(2);
   uint8_t count=0;
+
   do
   {
     count += Serial.readBytes(buffer+count, maxSize);
     delay(2);
-  } while( (count < maxSize) && (Serial.available()) );
+  } while( (count < maxSize) && !(Serial.available() == 0) );
+}
 
-  return true;
+/**************************************************************************/
+/*!
+    @brief  Print pre-defined control keys
+*/
+/**************************************************************************/
+void printDefinedControlKey(void)
+{
+  Serial.println();
+  Serial.println(F("You can send a raw 16-bit (e.g 0x1234) usage key from the USB" "\n"
+                    "HID Consumer Control Page or use one of the the following keys:"));
+
+  Serial.println(F("List of pre-defined control keys:"));
+  Serial.print(F(
+    "- BRIGHTNESS+" "\n"
+    "- BRIGHTNESS-" "\n"
+    "- PLAYPAUSE" "\n"
+    "- MEDIANEXT" "\n"
+    "- MEDIAPREVIOUS" "\n"
+    "- MEDIASTOP" "\n"
+    "- VOLUME" "\n"
+    "- MUTE" "\n"
+    "- BASS" "\n"
+    "- TREBLE" "\n"
+    "- BASS_BOOST" "\n"
+    "- VOLUME+" "\n"
+    "- VOLUME-" "\n"
+    "- BASS+" "\n"
+    "- BASS-" "\n"
+    "- TREBLE+" "\n"
+    "- TREBLE-" "\n"
+    "- EMAILREADER" "\n"
+    "- CALCULATOR" "\n"
+    "- FILEBROWSER" "\n"
+    "- SEARCH" "\n"
+    "- HOME" "\n"
+    "- BACK" "\n"
+    "- FORWARD" "\n"
+    "- STOP" "\n"
+    "- REFRESH" "\n"
+    "- BOOKMARKS" "\n"
+  ));
 }

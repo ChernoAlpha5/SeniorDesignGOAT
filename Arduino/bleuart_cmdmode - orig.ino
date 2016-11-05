@@ -157,8 +157,7 @@ void loop(void)
 {
   // Check for user input
   char inputs[BUFSIZE+1];
-  String strInputs = inputs;
-  
+
   if ( getUserInput(inputs, BUFSIZE) )
   {
     // Send characters to Bluefruit
