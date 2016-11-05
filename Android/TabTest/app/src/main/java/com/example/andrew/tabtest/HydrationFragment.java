@@ -16,6 +16,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import java.sql.Time;
 import java.text.DateFormat;
@@ -28,7 +29,8 @@ import java.util.Calendar;
  * A simple {@link Fragment} subclass.
  */
 public class HydrationFragment extends Fragment {
-    int xAxisInitMax = 1;  //constrict x axis window
+    int xAxisWindow = 30;          //(time in seconds) constrict x axis window to
+    long referenceTimestamp = -1;   // initial time stamp represents time in seconds since 1970. Initially -1 to indicate it has not been set yet
     LineChart hydrateChart;
     TextView hydrationLvl;
     View rootView;
@@ -36,7 +38,7 @@ public class HydrationFragment extends Fragment {
     int x  = 0;
     private ArrayList<Entry> entries;
     private LineDataSet dataSet;
-    private DecimalFormat mFormat;
+    IAxisValueFormatter xAxisFormatter;
 
     public HydrationFragment() {
         // Required empty public constructor
@@ -80,10 +82,15 @@ public class HydrationFragment extends Fragment {
         //set x axis options
         XAxis xaxis = hydrateChart.getXAxis();
         xaxis.setAxisMinimum(0f);
-        xaxis.setAxisMaximum(100f);
-        hydrateChart.setVisibleXRange(0, xAxisInitMax + 1);
+        xaxis.setAxisMaximum(86400);  //set x axis maximum to number of seconds in a day
         xaxis.setPosition(XAxisPosition.BOTTOM);
         xaxis.setTextSize(12f);
+        //format the x axis to display time
+        referenceTimestamp = System.currentTimeMillis()/1000;
+        xAxisFormatter = new HourAxisValueFormatter(referenceTimestamp);
+        xaxis.setValueFormatter(xAxisFormatter);
+        hydrateChart.setVisibleXRange(0, xAxisWindow);  //x axis is in seconds
+
 
         /*hydrateChart.getXAxis().setAxisMinimum(0);
         hydrateChart.getAxisLeft().setAxisMinimum(0);
@@ -122,7 +129,7 @@ public class HydrationFragment extends Fragment {
         //hydrateChart.setVisibleXRangeMaximum(8);
         //
         //hydrateChart.zoom(1,1, XVal, YVal);
-        hydrateChart.moveViewToX(data.getEntryCount()-5);
+        hydrateChart.moveViewToX(XVal - xAxisWindow/2);
         /*if (XVal > xAxisInitMax){
 
             //set x axis options
@@ -135,49 +142,24 @@ public class HydrationFragment extends Fragment {
         //entries.add(new Entry (XVal, YVal));
     }
 
-    /*private void addEntry(Entry entry) {
-
-        LineData data = hydrateChart.getData();
-
-        if (data != null) {
-
-            // get the dataset where you want to add the entry
-            LineDataSet set = data.getDataSetByIndex(0);
-
-            if (set == null) {
-                // create a new DataSet if there is none yet
-                set = createSet();
-                data.addDataSet(set);
-            }
-
-            // add a new x-value first
-            data.addXValue("somestring");
-            data.addEntry(entry, 0);
-
-            // let the chart know it's data has changed
-            hydrateChart.notifyDataSetChanged();
-
-            // limit the number of visible entries
-            hydrateChart.setVisibleXRange(0,6);
-
-            // move to the latest entry
-            hydrateChart.moveViewToX(data.getXValCount()-7);
-        }
-    } */
 
     /** Called when the user clicks the Send button. Must be public and void
      * Displays what the user entered into the edit_message widget
      * */
     public void hydrateDispMsg(View view){
         String message = editText.getText().toString();
-        Calendar calendar = Calendar.getInstance();
 
-        //int hours = new Time(System.currentTimeMillis()).getHours();
+        // set the start time in seconds the first time this function runs
+        /*if (referenceTimestamp < 0){
+            referenceTimestamp = System.currentTimeMillis()/1000;
+            xAxisFormatter = new HourAxisValueFormatter(referenceTimestamp);
+            XAxis xAxis = hydrateChart.getXAxis();
+            xAxis.setValueFormatter(xAxisFormatter);
 
-        int seconds = calendar.get(Calendar.SECOND);
-        int mins = calendar.get(Calendar.MINUTE);
-        int hrs = calendar.get(Calendar.HOUR);
-        float currTime = hrs + mins/60 + seconds/3600;
+        }*/
+
+        //subtract start time from every subsequent time measurement
+        long currTime = System.currentTimeMillis()/1000 -  referenceTimestamp;
 
         try{
             Integer intHydrateLvl = Integer.parseInt(message);
