@@ -106,7 +106,7 @@ public class HomeFragment extends Fragment {
         //data.addEntry(new Entry(XVal, YVal));
         data.notifyDataChanged();
         dataSet.addEntry(new Entry (XVal, YVal));
-        hydrateChart.notifyDataSetChanged(); // let the chart know it's data changed
+        hydrateChart.notifyDataSetChanged(); // let the chart know it's data has changed
         //hydrateChart.setVisibleXRangeMinimum(4f);
         //hydrateChart.setVisibleXRangeMaximum(8);
         //
@@ -124,7 +124,7 @@ public class HomeFragment extends Fragment {
         //entries.add(new Entry (XVal, YVal));
     }
 
-    /*private void addEn34try(Entry entry) {
+    /*private void addEntry(Entry entry) {
 
         LineData data = hydrateChart.getData();
 
