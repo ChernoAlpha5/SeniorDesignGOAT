@@ -101,7 +101,7 @@ public class HydrationFragment extends Fragment {
 
     // plot hydration graph
     private void initHPlot(){
-        entries = new ArrayList<>();
+        entries = new ArrayList<Entry>();
         entries.add(new Entry(0, 0f));
         dataSet = new LineDataSet(entries, "Hydration Level"); // add entries to dataset
         dataSet.setColor(Color.RED);
