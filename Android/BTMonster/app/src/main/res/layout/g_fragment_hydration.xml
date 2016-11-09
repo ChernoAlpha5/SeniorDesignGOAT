@@ -1,0 +1,52 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.adafruit.bluefruit.le.connect.app.graphData.HydrationFragment">
+    <!-- TODO: Update blank fragment layout -->
+
+    <EditText
+        android:id="@+id/edit_message"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter a value"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf ="@+id/button1"
+        android:layout_above="@+id/title"/>
+    <Button
+        android:id="@id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send"
+        android:onClick="hydrateDispMsg"
+        android:layout_alignParentRight="true"
+        android:layout_above="@id/title"/>
+    <TextView
+        android:id = "@id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Current Hydration Level"
+        android:gravity="center"
+        android:textSize = "25dp"
+        android:textStyle = "bold"
+        android:layout_above="@+id/hydrationLvl"/>
+    <TextView
+        android:id = "@id/hydrationLvl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No Data"
+        android:gravity="center"
+        android:textSize = "25dp"
+        android:textStyle = "bold"
+        android:layout_above="@+id/hydrateChart"/>
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id = "@id/hydrateChart"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true">
+    </com.github.mikephil.charting.charts.LineChart>
+
+</RelativeLayout>
