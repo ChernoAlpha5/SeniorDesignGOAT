@@ -45,4 +45,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-analytics:9.6.1'
     compile 'com.google.android.gms:play-services-location:9.6.1'
     compile 'com.google.android.gms:play-services-vision:9.6.1'
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.0'
 }
