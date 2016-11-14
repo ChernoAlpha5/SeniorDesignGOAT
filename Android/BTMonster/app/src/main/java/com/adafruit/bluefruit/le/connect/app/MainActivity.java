@@ -65,6 +65,8 @@ import com.adafruit.bluefruit.le.connect.ui.utils.DialogUtils;
 import com.adafruit.bluefruit.le.connect.ui.utils.ExpandableHeightExpandableListView;
 import com.adafruit.bluefruit.le.connect.ui.utils.MetricsUtils;
 
+import com.adafruit.bluefruit.le.connect.app.graphData.GraphActivity;
+
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -624,7 +626,9 @@ public class MainActivity extends AppCompatActivity implements BleManager.BleMan
                                 break;
                             }
                             case R.string.scan_connectservice_uart: {           // Uart
-                                mComponentToStartWhenConnected = UartActivity.class;
+                                //CHANGE THIS IF IT DOESN'T WORK
+                                //mComponentToStartWhenConnected = UartActivity.class;
+                                mComponentToStartWhenConnected = GraphActivity.class;
                                 break;
                             }
                             case R.string.scan_connectservice_pinio: {        // PinIO
@@ -1087,6 +1091,7 @@ public class MainActivity extends AppCompatActivity implements BleManager.BleMan
     }
     // endregion
 
+    //!!! MAJOR KEY: LAUNCHES ACTIVITY - mComponentToStartWhenConnected !!!
     private void launchComponentActivity() {
         // Enable generic attribute service
         final BluetoothGattService genericAttributeService = mBleManager.getGattService(kGenericAttributeService);
@@ -1113,7 +1118,7 @@ public class MainActivity extends AppCompatActivity implements BleManager.BleMan
             if (mComponentToStartWhenConnected == BeaconActivity.class && mSelectedDeviceData != null) {
                 intent.putExtra("rssi", mSelectedDeviceData.rssi);
             }
-            startActivityForResult(intent, kActivityRequestCode_ConnectedActivity);
+            startActivityForResult(intent, kActivityRequestCode_ConnectedActivity); //MAJOR KEY!!!
         }
     }
 

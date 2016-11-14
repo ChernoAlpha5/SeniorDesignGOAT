@@ -15,7 +15,7 @@ public class GraphActivity extends AppCompatActivity {
     Toolbar toolbar;
     TabLayout tabLayout;
     ViewPager viewPager;
-    ViewPagerAdapter viewPagerAdapter;
+    ViewPagerAdapter pagerAdapter;
 
 
     // hydration plot variables
@@ -28,16 +28,16 @@ public class GraphActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.g_activity_graph);
         toolbar = (Toolbar)findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
         tabLayout = (TabLayout)findViewById(R.id.tabLayout);
-        viewPager = (ViewPager)findViewById(R.id.viewPager);
+        viewPager = (ViewPager)findViewById(R.id.g_viewPager);
         //chart = (LineChart) findViewById(R.id.hydrateChart);
-        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        viewPagerAdapter.addFragments(new HydrationFragment(), "Hydration");
-        viewPagerAdapter.addFragments(new RespirationFragment(), "Respiration");
-        viewPager.setAdapter(viewPagerAdapter);
+        pagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        pagerAdapter.addFragments(new HydrationFragment(), "Hydration");
+        pagerAdapter.addFragments(new RespirationFragment(), "Respiration");
+        viewPager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
     }
