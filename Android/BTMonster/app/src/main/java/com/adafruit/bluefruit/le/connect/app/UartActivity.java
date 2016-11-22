@@ -562,7 +562,7 @@ public class UartActivity extends UartInterfaceActivity implements MqttManager.M
                 mReceivedBytes += bytes.length;
 
                 final UartDataChunk dataChunk = new UartDataChunk(System.currentTimeMillis(), UartDataChunk.TRANSFERMODE_RX, bytes);
-                mDataBuffer.add(dataChunk);
+                mDataBuffer.add(dataChunk);  //IMPORTANT!!!
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -645,7 +645,7 @@ public class UartActivity extends UartInterfaceActivity implements MqttManager.M
 
                 // Log.d(TAG, "update packets: "+(bufferSize-mDataBufferLastSize));
                 for (int i = mDataBufferLastSize; i < bufferSize; i++) {
-                    final UartDataChunk dataChunk = mDataBuffer.get(i);
+                    final UartDataChunk dataChunk = mDataBuffer.get(i); //IMPORTANT!!!
                     final boolean isRX = dataChunk.getMode() == UartDataChunk.TRANSFERMODE_RX;
                     final byte[] bytes = dataChunk.getData();
                     final String formattedData = mShowDataInHexFormat ? bytesToHex(bytes) : bytesToText(bytes, true);

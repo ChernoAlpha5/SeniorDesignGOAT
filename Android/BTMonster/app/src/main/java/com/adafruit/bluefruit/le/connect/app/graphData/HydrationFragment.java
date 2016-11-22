@@ -44,8 +44,7 @@ public class HydrationFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView =  inflater.inflate(R.layout.g_fragment_hydration, container, false);
 
@@ -115,6 +114,8 @@ public class HydrationFragment extends Fragment {
         addHPoint(0,6f);*/
     }
 
+
+
     // add one point to hydration plot
     private void addHPoint(float XVal, float YVal){
         LineData data = hydrateChart.getData();
@@ -171,6 +172,51 @@ public class HydrationFragment extends Fragment {
         catch(NumberFormatException e){
             hydrationLvl.setText("Invalid entry");
         }
+    }
+
+    /** Called when new UART data received. Must be public and void
+     * Displays what the user entered into the edit_message widget
+     * */
+    public void hydrateDispMsg2(String data){
+        //String message = editText.getText().toString();
+
+        // set the start time in seconds the first time this function runs
+        /*if (referenceTimestamp < 0){
+            referenceTimestamp = System.currentTimeMillis()/1000;
+            xAxisFormatter = new HourAxisValueFormatter(referenceTimestamp);
+            XAxis xAxis = hydrateChart.getXAxis();
+            xAxis.setValueFormatter(xAxisFormatter);
+
+        }*/
+
+        //subtract start time from every subsequent time measurement
+        long currTime = System.currentTimeMillis()/1000 -  referenceTimestamp;
+        String currMsg = hydrationLvl.getText().toString();
+        try{
+
+            Integer intHydrateLvl = Integer.parseInt(data);
+            DateFormat df = new SimpleDateFormat("EEE, d MMM, HH:mm");
+            String mydate = df.format(Calendar.getInstance().getTime());
+            hydrationLvl.setText(intHydrateLvl  + "% as of " + mydate);
+            addHPoint(currTime, intHydrateLvl);
+            //addHPoint(x, intHydrateLvl);
+            //x++;
+        }
+        catch(NumberFormatException e){
+            hydrationLvl.setText("Invalid entry");
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
     }
 
 

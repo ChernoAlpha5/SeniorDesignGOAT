@@ -34,4 +34,10 @@
         android:id = "@+id/g_viewPager">
     </android.support.v4.view.ViewPager>
 
+    <fragment android:name="com.adafruit.bluefruit.le.connect.app.graphData.HydrationFragment"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:id="@+id/hydration_fragment" />
+
 </RelativeLayout>
