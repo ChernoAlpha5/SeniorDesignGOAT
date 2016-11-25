@@ -170,13 +170,14 @@ void loop(void)
   Serial.print("[Send] ");
   Serial.println(dataPt);
   ble.print("AT+BLEUARTTX=");
-  ble.println(dataPt + ", ");
+  //ble.println(dataPt + ", ");
+  ble.println(dataPt);
   
    // check response status
   if (! ble.waitForOK() ) {
       Serial.println(F("Failed to send?"));
   }
-  delay(500);
+  delay(600);
   
   /*if ( getUserInput(inputs, BUFSIZE) )
   {
