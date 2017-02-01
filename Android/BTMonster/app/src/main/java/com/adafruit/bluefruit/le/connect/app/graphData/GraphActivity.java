@@ -579,6 +579,7 @@ public class GraphActivity extends UartInterfaceActivity implements MqttManager.
         enableRxNotifications();
     }
 
+    //THIS IS SO IMPORTANT LIKE I CANNOT STRESS IT ENOUGH!!!
     @Override
     public synchronized void onDataAvailable(BluetoothGattCharacteristic characteristic) {
         super.onDataAvailable(characteristic);
@@ -601,22 +602,22 @@ public class GraphActivity extends UartInterfaceActivity implements MqttManager.
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        hydrateFrag = (HydrationFragment) getSupportFragmentManager().findFragmentById(R.id.hydration_fragment);
+                        //hydrateFrag = (HydrationFragment) getSupportFragmentManager().findFragmentById(R.id.hydration_fragment);
+                        hydrateFrag = (HydrationFragment) pagerAdapter.getFragment(0);  //is 0 the position in the hashmap??
                         if (hydrateFrag != null){
                             String byteStr = "";
                             try {
                                 byteStr = new String(bytes, "ASCII"); // for ASCII encoding
+                                hydrateFrag.hydrateDispMsg2(byteStr);
                             } catch (UnsupportedEncodingException e) {
                                 e.printStackTrace();
                             }
-
-                            hydrateFrag.hydrateDispMsg2(byteStr);
-                            // attempt to refresh fragment
+                            /*// attempt to refresh fragment
                             getSupportFragmentManager()
                                     .beginTransaction()
                                     .detach( hydrateFrag)
                                     .attach( hydrateFrag)
-                                    .commit();
+                                    .commit();*/
                         }
 
                         if (mIsTimestampDisplayMode) {
