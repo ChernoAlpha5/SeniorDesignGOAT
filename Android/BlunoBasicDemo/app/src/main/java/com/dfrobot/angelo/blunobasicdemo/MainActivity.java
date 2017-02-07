@@ -1,6 +1,6 @@
 package com.dfrobot.angelo.blunobasicdemo;
 
-import android.content.Context;
+//import android.content.Context;
 import android.os.Bundle;
 import android.content.Intent;
 import android.view.View;
@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import com.dfrobot.angelo.blunobasicdemo.graphData.GraphActivity;
 
 public class MainActivity  extends BlunoLibrary {
 	private Button buttonScan;
@@ -19,6 +21,7 @@ public class MainActivity  extends BlunoLibrary {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+        final Intent intent = new Intent(MainActivity.this,GraphActivity.class);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
         onCreateProcess();														//onCreate Process by BlunoLibrary
@@ -42,7 +45,6 @@ public class MainActivity  extends BlunoLibrary {
 
         buttonScan = (Button) findViewById(R.id.buttonScan);					//initial the button for scanning the BLE device
         buttonScan.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
@@ -54,9 +56,14 @@ public class MainActivity  extends BlunoLibrary {
 		//launch graph activity
 		buttonLaunch = (Button) findViewById(R.id.buttonLaunch);		//initial the button for sending the data
 		buttonLaunch.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
+				//setContentView(R.layout.g_activity_graph);
+
+/*				EditText editText = (EditText) findViewById(R.id.edit_message);
+				String message = editText.getText().toString();
+				intent.putExtra(EXTRA_MESSAGE, message);*/
+				startActivity(intent);
 			}
 		});
 	}

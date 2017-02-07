@@ -29,6 +29,20 @@ PackageManager.hasSystemFeature(FEATURE_BLUETOOTH_LE) -->
             </intent-filter>
         </activity>
         <service android:name="com.dfrobot.angelo.blunobasicdemo.BluetoothLeService" android:enabled="true"/>
+        <activity
+            android:name="graphData.GraphActivity"
+            android:theme="@style/AppTheme"
+            android:label="Graph">
+            <!--android:allowBackup="true"
+            android:icon="@mipmap/ic_launcher"
+
+            android:supportsRtl="true"
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter> -->
+        </activity>
 
     </application>
 
