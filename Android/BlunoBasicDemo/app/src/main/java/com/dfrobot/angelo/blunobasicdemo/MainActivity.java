@@ -10,8 +10,6 @@ import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.dfrobot.angelo.blunobasicdemo.graphData.GraphActivity;
-
 public class MainActivity  extends BlunoLibrary {
 	private Button buttonScan;
 	private Button buttonSerialSend;

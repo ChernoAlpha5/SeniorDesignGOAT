@@ -1,4 +1,4 @@
-package com.dfrobot.angelo.blunobasicdemo.graphData;
+package com.dfrobot.angelo.blunobasicdemo;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -7,6 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import com.dfrobot.angelo.blunobasicdemo.R;
 
+import com.dfrobot.angelo.blunobasicdemo.graphData.HydrationFragment;
+import com.dfrobot.angelo.blunobasicdemo.graphData.RespirationFragment;
+import com.dfrobot.angelo.blunobasicdemo.graphData.ViewPagerAdapter;
 import com.github.mikephil.charting.data.Entry;
 
 import java.util.ArrayList;
