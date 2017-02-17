@@ -1,6 +1,12 @@
 package com.dfrobot.angelo.blunobasicdemo;
 
 //import android.content.Context;
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.content.Intent;
 import android.view.View;
@@ -9,10 +15,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.support.v4.content.PermissionChecker;
 
 import com.dfrobot.angelo.blunobasicdemo.graphData.GraphActivity;
 
 public class MainActivity  extends BlunoLibrary {
+	private static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
 	private Button buttonScan;
 	private Button buttonSerialSend;
 	private Button buttonLaunch;		//launch graph activity
@@ -66,6 +74,7 @@ public class MainActivity  extends BlunoLibrary {
 				startActivity(intent);
 			}
 		});
+		requestLocationPermissionIfNeeded();
 	}
 
 	protected void onResume(){
@@ -128,6 +137,25 @@ public class MainActivity  extends BlunoLibrary {
 		serialReceivedText.append(theString);							//append the text into the EditText
 		//The Serial data from the BLUNO may be sub-packaged, so using a buffer to hold the String is a good choice.
 		((ScrollView)serialReceivedText.getParent()).fullScroll(View.FOCUS_DOWN);
+	}
+
+	@TargetApi(Build.VERSION_CODES.M)
+	private void requestLocationPermissionIfNeeded() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			// Android M Permission check 
+			if (this.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+				final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle("This app needs location access");
+				builder.setMessage("Please grant location access so this app can scan for Bluetooth peripherals");
+				builder.setPositiveButton(android.R.string.ok, null);
+				builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					public void onDismiss(DialogInterface dialog) {
+						requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_FINE_LOCATION);
+					}
+				});
+				builder.show();
+			}
+		}
 	}
 
 }
