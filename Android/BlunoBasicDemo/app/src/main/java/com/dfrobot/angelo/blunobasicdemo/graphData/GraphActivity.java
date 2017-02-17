@@ -1,4 +1,4 @@
-package com.dfrobot.angelo.blunobasicdemo;
+package com.dfrobot.angelo.blunobasicdemo.graphData;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
