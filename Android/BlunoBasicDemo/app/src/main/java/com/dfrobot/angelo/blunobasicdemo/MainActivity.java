@@ -9,14 +9,18 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.content.Intent;
+import android.os.Parcelable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.support.v4.content.PermissionChecker;
-
+import com.dfrobot.angelo.blunobasicdemo.graphData.*;
 import com.dfrobot.angelo.blunobasicdemo.graphData.GraphActivity;
 
 public class MainActivity  extends BlunoLibrary {
@@ -26,14 +30,30 @@ public class MainActivity  extends BlunoLibrary {
 	private Button buttonLaunch;		//launch graph activity
 	private EditText serialSendText;
 	private TextView serialReceivedText;
+
+	//GRAPH ACTIVITY VARIABLES
+	/*Toolbar toolbar;
+	TabLayout tabLayout;
+	ViewPager viewPager;
+	ViewPagerAdapter pagerAdapter;
+	HydrationFragment hydrateFrag; */
+	GraphActivity graphActivity;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-        final Intent intent = new Intent(MainActivity.this,GraphActivity.class);
 		super.onCreate(savedInstanceState);
+        final Intent intent = new Intent(MainActivity.this,GraphActivity.class);
+		//intent.putExtra("score_key", score);
+		startActivity(intent);
+		graphActivity = new GraphActivity();
+		//graphActivity = (GraphActivity)findViewById(R.id.g_activity);	//TODO: IMPORTANT!!!
+		//toolbar = (Toolbar)findViewById(R.id.toolBar);
+		/*tabLayout = (TabLayout)findViewById(R.id.tabLayout);
+		viewPager = (ViewPager)findViewById(R.id.g_viewPager);*/
+		//pagerAdapter = (ViewPagerAdapter)findViewById(R.id.g_viewPager);
+
 		setContentView(R.layout.activity_main);
         onCreateProcess();														//onCreate Process by BlunoLibrary
-
 
         serialBegin(115200);													//set the Uart Baudrate on BLE chip to 115200
 
@@ -67,11 +87,8 @@ public class MainActivity  extends BlunoLibrary {
 			@Override
 			public void onClick(View v) {
 				//setContentView(R.layout.g_activity_graph);
-
-/*				EditText editText = (EditText) findViewById(R.id.edit_message);
-				String message = editText.getText().toString();
-				intent.putExtra(EXTRA_MESSAGE, message);*/
 				startActivity(intent);
+
 			}
 		});
 		requestLocationPermissionIfNeeded();
@@ -132,8 +149,8 @@ public class MainActivity  extends BlunoLibrary {
 	}
 
 	@Override
-	public void onSerialReceived(String theString) {							//Once connection data received, this function will be called
-		// TODO Auto-generated method stub
+	public void onSerialReceived(final String theString) {							//Once connection data received, this function will be called
+		graphActivity.updateGraph(theString);
 		serialReceivedText.append(theString);							//append the text into the EditText
 		//The Serial data from the BLUNO may be sub-packaged, so using a buffer to hold the String is a good choice.
 		((ScrollView)serialReceivedText.getParent()).fullScroll(View.FOCUS_DOWN);
@@ -157,5 +174,6 @@ public class MainActivity  extends BlunoLibrary {
 			}
 		}
 	}
+
 
 }

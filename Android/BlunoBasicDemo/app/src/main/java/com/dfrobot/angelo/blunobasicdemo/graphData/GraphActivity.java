@@ -19,7 +19,8 @@ public class GraphActivity extends AppCompatActivity {
     TabLayout tabLayout;
     ViewPager viewPager;
     ViewPagerAdapter viewPagerAdapter;
-
+    HydrationFragment hydrateFrag;
+    RespirationFragment respirationFrag;
 
     // hydration plot variables
    // LineChart chart;
@@ -38,10 +39,28 @@ public class GraphActivity extends AppCompatActivity {
         viewPager = (ViewPager)findViewById(R.id.g_viewPager);
         //chart = (LineChart) findViewById(R.id.hydrateChart);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        viewPagerAdapter.addFragments(new HydrationFragment(), "Hydration");
-        viewPagerAdapter.addFragments(new RespirationFragment(), "Respiration");
+        hydrateFrag = new HydrationFragment();
+        viewPagerAdapter.addFragments(hydrateFrag, "Hydration");
+        respirationFrag = new RespirationFragment();
+        viewPagerAdapter.addFragments(respirationFrag, "Respiration");
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
+    }
+
+    public void updateGraph(String theString){
+        // TODO Auto-generated method stub
+        final String input = theString;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //hydrateFrag = (HydrationFragment) getSupportFragmentManager().findFragmentById(R.id.hydration_fragment);
+                //hydrateFrag = (HydrationFragment) pagerAdapter.getFragment(0);  //is 0 the position in the hashmap??
+                if (hydrateFrag != null){
+                    hydrateFrag.hydrateDispMsg2(input);
+                }
+
+            }
+        });
     }
 }
