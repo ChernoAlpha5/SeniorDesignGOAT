@@ -19,14 +19,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import andrew.bluno2.BlunoLibrary;
-import andrew.bluno2.Graph.*;
+import andrew.bluno2.MainActivity;
 
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import andrew.bluno2.R;
 
-public class GraphActivity extends BlunoLibrary {
+public class GraphActivity extends MainActivity {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -179,7 +179,7 @@ public class GraphActivity extends BlunoLibrary {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_respiration, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_hydration, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             //textView.setText("ayyyllama");

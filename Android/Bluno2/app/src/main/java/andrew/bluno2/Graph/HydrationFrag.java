@@ -10,10 +10,10 @@ import android.widget.TextView;
 import andrew.bluno2.R;
 
 /**
- * Created by Andrew on 2/18/2017.
+ * Created by Andrew on 2/19/2017.
  */
 
-public class RespirationFrag extends Fragment {
+public class HydrationFrag extends Fragment {
     /**
      * The fragment argument representing the section number for this
      * fragment.
@@ -21,7 +21,7 @@ public class RespirationFrag extends Fragment {
     //private static final String ARG_SECTION_NUMBER = "section_number";
     private TextView textView;
 
-    public RespirationFrag() {
+    public HydrationFrag() {
     }
 
     /**
@@ -38,10 +38,10 @@ public class RespirationFrag extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_respiration, container, false);
-        textView = (TextView) rootView.findViewById(R.id.r_msgSent);
+        View rootView = inflater.inflate(R.layout.fragment_hydration, container, false);
+        textView = (TextView) rootView.findViewById(R.id.h_msgSent);
         //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-        textView.setText("Respiration");
+        textView.setText("Hydration");
         return rootView;
     }
 

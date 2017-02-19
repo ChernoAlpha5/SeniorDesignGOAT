@@ -44,8 +44,8 @@ public class MainActivity  extends BlunoLibrary {
 		super.onCreate(savedInstanceState);
         final Intent intent = new Intent(MainActivity.this,GraphActivity.class);
 		//intent.putExtra("score_key", score);
-		startActivity(intent);
-		graphHelp = new GraphHelper();
+		//startActivity(intent);
+		//graphHelp = new GraphHelper();
 		//graphActivity = (GraphActivity)findViewById(R.id.g_activity);	//TODO: IMPORTANT!!!
 		//toolbar = (Toolbar)findViewById(R.id.toolBar);
 		/*tabLayout = (TabLayout)findViewById(R.id.tabLayout);

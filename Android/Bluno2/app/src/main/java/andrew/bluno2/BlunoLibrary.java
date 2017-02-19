@@ -30,7 +30,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BlunoLibrary  extends AppCompatActivity {
+public abstract class BlunoLibrary extends AppCompatActivity{
 
 	private Context mainContext=this;
 

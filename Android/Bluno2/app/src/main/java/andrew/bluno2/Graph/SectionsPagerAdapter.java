@@ -4,6 +4,8 @@ package andrew.bluno2.Graph;
  * Created by Andrew on 2/18/2017.
  */
 
+//manages fragments
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -16,7 +18,7 @@ import java.io.Serializable;
 public class SectionsPagerAdapter extends FragmentPagerAdapter /*implements Serializable*/{
     //private static WeakReference<Activity> mActivityRef;
     private RespirationFrag respFrag ;
-    private RespirationFrag hydrFrag; //TODO: CREATE A HYDRATION FRAGMENT
+    private HydrationFrag hydrFrag;
     public SectionsPagerAdapter(FragmentManager fm) {
         super(fm);
     }
@@ -36,7 +38,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter /*implements Seri
             case 0:
                 return new RespirationFrag();  //create new respiration fragment
             case 1:
-                return new RespirationFrag();   //TODO: CREATE A HYDRATION FRAGMENT
+                return new HydrationFrag();   //CREATE A HYDRATION FRAGMENT
             default:
                 // This should never happen. Always account for each position above
                 return null;
@@ -56,7 +58,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter /*implements Seri
                 respFrag = (RespirationFrag) createdFragment;
                 break;
             case 1:
-                hydrFrag = (RespirationFrag) createdFragment;
+                hydrFrag = (HydrationFrag) createdFragment;
                 break;
         }
         return createdFragment;
@@ -64,7 +66,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter /*implements Seri
 
     @Override
     public int getCount() {
-        // Show 3 total pages.
+        // Show 2 total pages.
         return 2;
     }
 
