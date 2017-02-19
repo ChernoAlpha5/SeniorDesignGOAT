@@ -48,19 +48,8 @@ public class GraphActivity extends AppCompatActivity {
 
     }
 
-    public void updateGraph(String theString){
-        // TODO Auto-generated method stub
-        final String input = theString;
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                //hydrateFrag = (HydrationFragment) getSupportFragmentManager().findFragmentById(R.id.hydration_fragment);
-                //hydrateFrag = (HydrationFragment) pagerAdapter.getFragment(0);  //is 0 the position in the hashmap??
-                if (hydrateFrag != null){
-                    hydrateFrag.hydrateDispMsg2(input);
-                }
-
-            }
-        });
+    public ViewPagerAdapter getPagerAdapter(){
+        return viewPagerAdapter;
     }
+
 }

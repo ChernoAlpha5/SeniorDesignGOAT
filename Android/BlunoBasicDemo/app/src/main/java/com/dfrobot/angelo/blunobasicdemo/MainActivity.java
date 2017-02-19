@@ -35,9 +35,9 @@ public class MainActivity  extends BlunoLibrary {
 	/*Toolbar toolbar;
 	TabLayout tabLayout;
 	ViewPager viewPager;
-	ViewPagerAdapter pagerAdapter;
-	HydrationFragment hydrateFrag; */
-	GraphActivity graphActivity;
+	ViewPagerAdapter pagerAdapter; */
+	HydrationFragment hydrateFrag;
+	GraphHelper graphHelp;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +45,7 @@ public class MainActivity  extends BlunoLibrary {
         final Intent intent = new Intent(MainActivity.this,GraphActivity.class);
 		//intent.putExtra("score_key", score);
 		startActivity(intent);
-		graphActivity = new GraphActivity();
+		graphHelp = new GraphHelper();
 		//graphActivity = (GraphActivity)findViewById(R.id.g_activity);	//TODO: IMPORTANT!!!
 		//toolbar = (Toolbar)findViewById(R.id.toolBar);
 		/*tabLayout = (TabLayout)findViewById(R.id.tabLayout);
@@ -87,7 +87,7 @@ public class MainActivity  extends BlunoLibrary {
 			@Override
 			public void onClick(View v) {
 				//setContentView(R.layout.g_activity_graph);
-				startActivity(intent);
+				//startActivity(intent);
 
 			}
 		});
@@ -150,7 +150,8 @@ public class MainActivity  extends BlunoLibrary {
 
 	@Override
 	public void onSerialReceived(final String theString) {							//Once connection data received, this function will be called
-		graphActivity.updateGraph(theString);
+		hydrateFrag = (HydrationFragment)getFragmentManager().findFragmentByTag("hFrag");
+		graphHelp.updateGraph(theString);
 		serialReceivedText.append(theString);							//append the text into the EditText
 		//The Serial data from the BLUNO may be sub-packaged, so using a buffer to hold the String is a good choice.
 		((ScrollView)serialReceivedText.getParent()).fullScroll(View.FOCUS_DOWN);
