@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="andrew.bluno2">
 
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -19,6 +24,8 @@
             android:name=".Graph.GraphActivity"
             android:label="@string/title_activity_graph"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <service android:name="andrew.bluno2.BluetoothLeService" android:enabled="true"/>
     </application>
 
 </manifest>

@@ -9,8 +9,9 @@
     tools:context="andrew.bluno2.Graph.RespirationFrag">
 
     <TextView
-        android:id="@+id/section_label"
+        android:id="@+id/msgSent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+        />
 
 </RelativeLayout>

@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import andrew.bluno2.R;
 
 /**
@@ -18,7 +20,8 @@ public class RespirationFrag extends Fragment {
      * The fragment argument representing the section number for this
      * fragment.
      */
-    private static final String ARG_SECTION_NUMBER = "section_number";
+    //private static final String ARG_SECTION_NUMBER = "section_number";
+    private TextView textView;
 
     public RespirationFrag() {
     }
@@ -37,15 +40,18 @@ public class RespirationFrag extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_graph, container, false);
-        TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+        View rootView = inflater.inflate(R.layout.fragment_respiration, container, false);
+        textView = (TextView) rootView.findViewById(R.id.msgSent);
         //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
         textView.setText("Respiration");
         return rootView;
     }
 
     public void setData(String data){
-        TextView textView = (TextView)getView().findViewById(R.id.section_label);
-        textView.setText(data);
+        //TextView textView = (TextView)getView().findViewById(R.id.msgSent);
+        if (textView != null){
+            textView.setText(data);
+        }
+
     }
 }

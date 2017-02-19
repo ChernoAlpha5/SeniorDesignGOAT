@@ -30,7 +30,7 @@
         android:layout_below="@id/title"
         android:layout_toRightOf="@+id/msgBox"
         android:text="Send Message"
-        android:onClick="sendMsg" />
+        android:onClick="sendBtnMsg" />
     <Button
         android:id="@+id/btnLaunch"
         android:layout_width="wrap_content"

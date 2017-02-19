@@ -1,5 +1,6 @@
 package andrew.bluno2.Graph;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -17,11 +18,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import andrew.bluno2.BlunoLibrary;
+import andrew.bluno2.Graph.*;
+
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import andrew.bluno2.R;
 
-public class GraphActivity extends AppCompatActivity {
+public class GraphActivity extends BlunoLibrary {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -60,8 +65,9 @@ public class GraphActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                sendMessage();
+                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show(); */
             }
         });
 
@@ -89,7 +95,62 @@ public class GraphActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+    @Override
+    public void onSerialReceived(final String theString) {							//Once connection data received, this function will be called
+        RespirationFrag respFrag = (RespirationFrag) getSupportFragmentManager().findFragmentById(R.id.respFragment);
+        if (respFrag != null)
+            respFrag.setData(theString);
+    }
 
+    public void scanBTDevices(){
+        buttonScanOnClickProcess();
+    }
+
+
+    @Override
+    public void onConectionStateChange(connectionStateEnum theConnectionState) {//Once connection state changes, this function will be called
+       /* switch (theConnectionState) {											//Four connection state
+            case isConnected:
+                buttonScan.setText("Connected");
+                break;
+            case isConnecting:
+                buttonScan.setText("Connecting");
+                break;
+            case isToScan:
+                buttonScan.setText("Scan");
+                break;
+            case isScanning:
+                buttonScan.setText("Scanning");
+                break;
+            case isDisconnecting:
+                buttonScan.setText("isDisconnecting");
+                break;
+            default:
+                break;
+        }*/
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        onActivityResultProcess(requestCode, resultCode, data);					//onActivityResult Process by BlunoLibrary
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    //for debugging only
+    public void sendMessage() {
+        // do work on the referenced Fragments, but first check if they
+        // even exist yet, otherwise you'll get an NPE.
+        RespirationFrag respFrag = (RespirationFrag) getSupportFragmentManager().findFragmentById(R.id.respFragment);
+        if (respFrag != null)
+            respFrag.setData("It's ya boi");
+       /* runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (respFrag != null)
+                    respFrag.setData("It's ya boi");
+            }
+        });*/
+    }
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -118,7 +179,7 @@ public class GraphActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_graph, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_respiration, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             //textView.setText("ayyyllama");

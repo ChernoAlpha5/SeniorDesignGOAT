@@ -150,8 +150,8 @@ public class MainActivity  extends BlunoLibrary {
 
 	@Override
 	public void onSerialReceived(final String theString) {							//Once connection data received, this function will be called
-		hydrateFrag = (HydrationFragment)getFragmentManager().findFragmentByTag("hFrag");
-		graphHelp.updateGraph(theString);
+		//hydrateFrag = (HydrationFragment)getFragmentManager().findFragmentByTag("hFrag");
+		//graphHelp.updateGraph(theString);
 		serialReceivedText.append(theString);							//append the text into the EditText
 		//The Serial data from the BLUNO may be sub-packaged, so using a buffer to hold the String is a good choice.
 		((ScrollView)serialReceivedText.getParent()).fullScroll(View.FOCUS_DOWN);

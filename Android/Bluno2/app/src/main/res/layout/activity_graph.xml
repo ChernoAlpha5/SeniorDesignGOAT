@@ -46,4 +46,10 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
+    <fragment android:name="andrew.bluno2.Graph.RespirationFrag"
+        android:id="@+id/respFragment"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent" />
+
 </android.support.design.widget.CoordinatorLayout>
