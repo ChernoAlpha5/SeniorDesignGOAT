@@ -341,7 +341,7 @@ public abstract  class BlunoLibrary  extends AppCompatActivity{
         }
     };
 	
-    void buttonScanOnClickProcess()
+    public void buttonScanOnClickProcess()
     {
     	switch (mConnectionState) {
 		case isNull:

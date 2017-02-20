@@ -9,11 +9,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.content.Intent;
-import android.os.Parcelable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
-import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -32,25 +27,12 @@ public class MainActivity  extends BlunoLibrary {
 	private TextView serialReceivedText;
 
 	//GRAPH ACTIVITY VARIABLES
-	/*Toolbar toolbar;
-	TabLayout tabLayout;
-	ViewPager viewPager;
-	ViewPagerAdapter pagerAdapter; */
 	HydrationFragment hydrateFrag;
-	GraphHelper graphHelp;
+	private Intent intent;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        final Intent intent = new Intent(MainActivity.this,GraphActivity.class);
-		//intent.putExtra("score_key", score);
-		//startActivity(intent);
-		//graphHelp = new GraphHelper();
-		//graphActivity = (GraphActivity)findViewById(R.id.g_activity);	//TODO: IMPORTANT!!!
-		//toolbar = (Toolbar)findViewById(R.id.toolBar);
-		/*tabLayout = (TabLayout)findViewById(R.id.tabLayout);
-		viewPager = (ViewPager)findViewById(R.id.g_viewPager);*/
-		//pagerAdapter = (ViewPagerAdapter)findViewById(R.id.g_viewPager);
 
 		setContentView(R.layout.activity_main);
         onCreateProcess();														//onCreate Process by BlunoLibrary
@@ -65,8 +47,6 @@ public class MainActivity  extends BlunoLibrary {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-
 				serialSend(serialSendText.getText().toString());				//send the data to the BLUNO
 			}
 		});
@@ -75,8 +55,6 @@ public class MainActivity  extends BlunoLibrary {
         buttonScan.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-
 				buttonScanOnClickProcess();										//Alert Dialog for selecting the BLE device
 			}
 		});
@@ -87,7 +65,8 @@ public class MainActivity  extends BlunoLibrary {
 			@Override
 			public void onClick(View v) {
 				//setContentView(R.layout.g_activity_graph);
-				//startActivity(intent);
+				intent = new Intent(MainActivity.this,GraphActivity.class);
+				startActivity(intent);
 
 			}
 		});
@@ -99,8 +78,6 @@ public class MainActivity  extends BlunoLibrary {
 		System.out.println("BlUNOActivity onResume");
 		onResumeProcess();														//onResume Process by BlunoLibrary
 	}
-	
-	
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
