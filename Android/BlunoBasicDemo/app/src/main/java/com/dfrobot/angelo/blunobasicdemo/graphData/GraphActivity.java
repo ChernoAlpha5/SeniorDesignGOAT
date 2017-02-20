@@ -1,5 +1,6 @@
 package com.dfrobot.angelo.blunobasicdemo.graphData;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -12,6 +13,7 @@ import com.github.mikephil.charting.data.Entry;
 import android.view.View;
 import android.widget.Button;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 public class GraphActivity extends BlunoLibrary {
@@ -58,6 +60,35 @@ public class GraphActivity extends BlunoLibrary {
         return viewPagerAdapter;
     }
 
+    protected void onResume(){
+        super.onResume();
+        System.out.println("BlUNOActivity onResume");
+        onResumeProcess();														//onResume Process by BlunoLibrary
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        onActivityResultProcess(requestCode, resultCode, data);					//onActivityResult Process by BlunoLibrary
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        onPauseProcess();														//onPause Process by BlunoLibrary
+    }
+
+    protected void onStop() {
+        super.onStop();
+        onStopProcess();														//onStop Process by BlunoLibrary
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        onDestroyProcess();														//onDestroy Process by BlunoLibrary
+    }
+
     @Override
     public void onConectionStateChange(connectionStateEnum theConnectionState) {//Once connection state changes, this function will be called
         switch (theConnectionState) {											//Four connection state
@@ -89,15 +120,25 @@ public class GraphActivity extends BlunoLibrary {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                hydrateFrag = (HydrationFragment) getSupportFragmentManager().findFragmentById(R.id.hydration_fragment);
-                //hydrateFrag = (HydrationFragment) pagerAdapter.getFragment(0);  //is 0 the position in the hashmap??
+                //hydrateFrag = (HydrationFragment) getSupportFragmentManager().findFragmentById(R.id.hydration_fragment);
+                hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(1);  //is 0 the position in the hashmap??
                 if (hydrateFrag != null) {
                     //String byteStr = "";
-                    //byteStr = new String(bytes, "ASCII"); // for ASCII encoding
-                    hydrateFrag.hydrateDispMsg2(theString);
+                    //String byteStr = new String(theString, "ASCII"); // for ASCII encoding
+                    String s = theString.replaceAll("(\\r\\n|\\r)", "\n");
+                    byte[] byteArr = s.getBytes();
+                    hydrateFrag.hydrateDispMsg2(bytesToText(byteArr, true));
                 }
             }
         });
 
+    }
+
+    private String bytesToText(byte[] bytes, boolean simplifyNewLine) {
+        String text = new String(bytes, Charset.forName("UTF-8"));
+        if (simplifyNewLine) {
+            text = text.replaceAll("(\\r\\n|\\r)", "\n");
+        }
+        return text;
     }
 }

@@ -5,15 +5,17 @@ void setup() {
 
 void loop()
 {
-    for (int i =0; i < 10; i++){
-      Serial.write("Cookies\n"); 
+    for (int i =0; i < 70; i++){
+      Serial.print(i); 
+      //Serial.print("\n"); 
+      delay(150);
     }
-    Serial.write("=======\n");
-    delay(1500);
-    if(Serial.available())
+    //Serial.write("=======\n");
+    delay(500);
+    /*if(Serial.available())
     {
         Serial.write(Serial.read());    //send what has been received
-    }
+    }*/
 }
 
 
