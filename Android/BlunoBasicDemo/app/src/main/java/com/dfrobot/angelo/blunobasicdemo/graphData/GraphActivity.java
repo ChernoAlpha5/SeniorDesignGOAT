@@ -17,6 +17,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 public class GraphActivity extends BlunoLibrary {
+    //UI elements
     Toolbar toolbar;
     TabLayout tabLayout;
     ViewPager viewPager;
@@ -25,10 +26,16 @@ public class GraphActivity extends BlunoLibrary {
     RespirationFragment respirationFrag;
     ConfigFragment configFrag;
     Button scanBtn;
+
     // hydration plot variables
     ArrayList<String> hXAXES = new ArrayList<String>();
     ArrayList<Entry> hYAXES = new ArrayList<Entry>();
     double startTime = 0;
+
+    //data collection variables
+    int numSamples = 0;
+    int maxSamples = 2000;
+    ArrayList<String> samples = new ArrayList<String>(2000);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +60,6 @@ public class GraphActivity extends BlunoLibrary {
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
-
     }
 
     public ViewPagerAdapter getPagerAdapter() {
@@ -93,7 +99,7 @@ public class GraphActivity extends BlunoLibrary {
     public void onConectionStateChange(connectionStateEnum theConnectionState) {//Once connection state changes, this function will be called
         switch (theConnectionState) {											//Four connection state
             case isConnected:
-                scanBtn.setText("Connected");
+                scanBtn.setText("Connected");   //TODO: FIX BUTTON CHANGES
                 break;
             case isConnecting:
                 scanBtn.setText("Connecting");
@@ -116,24 +122,43 @@ public class GraphActivity extends BlunoLibrary {
     }
 
     @Override
-    public void onSerialReceived(final String theString) {               //Once connection data received, this function will be called
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                //hydrateFrag = (HydrationFragment) getSupportFragmentManager().findFragmentById(R.id.hydration_fragment);
-                hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(1);  //is 0 the position in the hashmap??
-                if (hydrateFrag != null) {
-                    //String byteStr = "";
-                    //String byteStr = new String(theString, "ASCII"); // for ASCII encoding
-                    String s = theString.replaceAll("(\\r\\n|\\r)", "\n");
-                    byte[] byteArr = s.getBytes();
-                    hydrateFrag.hydrateDispMsg2(bytesToText(byteArr, true));
+    public void onSerialReceived(final String theString) {//Once connection data received, this function will be called
+
+       /* if (numSamples <  maxSamples ){
+            samples.add(theString);
+        }
+        else{
+            //processData(samples); */
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    //hydrateFrag = (HydrationFragment) getSupportFragmentManager().findFragmentById(R.id.hydration_fragment);
+                    hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(1);  //is 0 the position in the hashmap??
+                    if (hydrateFrag != null) {
+                        //String byteStr = "";
+                        //String byteStr = new String(theString, "ASCII"); // for ASCII encoding
+                        String s = theString.replaceAll("(\\r\\n|\\r)", "\n");
+                        byte[] byteArr = s.getBytes();
+                        hydrateFrag.hydrateDispMsg2(bytesToText(byteArr, true));
+                    }
                 }
-            }
-        });
+            });
+
+        //}
 
     }
+    //TODO: call filtereing method in this function
+    private void processData(ArrayList<String> data){
+        numSamples = 0;
+        for (String s: data){
+            s.replaceAll("(\\r\\n|\\r)", "\n");
+            byte[] byteArr = s.getBytes();
+            bytesToText(byteArr, true);
+        }
+        samples.clear();
+    }
 
+    //convert byte array to string
     private String bytesToText(byte[] bytes, boolean simplifyNewLine) {
         String text = new String(bytes, Charset.forName("UTF-8"));
         if (simplifyNewLine) {

@@ -215,8 +215,6 @@ public class HydrationFragment extends Fragment {
 
     }
 
-
-
     @Override
     public void onPause() {
         super.onPause();
