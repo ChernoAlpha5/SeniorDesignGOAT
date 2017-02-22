@@ -1,6 +1,12 @@
 package com.dfrobot.angelo.blunobasicdemo.graphData;
 
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -37,6 +43,8 @@ public class GraphActivity extends BlunoLibrary {
     int maxSamples = 2000;
     ArrayList<String> samples = new ArrayList<String>(2000);
 
+    private static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +68,7 @@ public class GraphActivity extends BlunoLibrary {
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
+        requestLocationPermissionIfNeeded();
     }
 
     public ViewPagerAdapter getPagerAdapter() {
@@ -165,5 +174,24 @@ public class GraphActivity extends BlunoLibrary {
             text = text.replaceAll("(\\r\\n|\\r)", "\n");
         }
         return text;
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void requestLocationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Android M Permission check 
+            if (this.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("This app needs location access");
+                builder.setMessage("Please grant location access so this app can scan for Bluetooth peripherals");
+                builder.setPositiveButton(android.R.string.ok, null);
+                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    public void onDismiss(DialogInterface dialog) {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_FINE_LOCATION);
+                    }
+                });
+                builder.show();
+            }
+        }
     }
 }
