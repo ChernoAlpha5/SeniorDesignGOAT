@@ -40,7 +40,7 @@ public class GraphActivity extends BlunoLibrary {
 
     //data collection variables
     int numSamples = 0;
-    int maxSamples = 2000;
+    int maxSamples = 500;
     ArrayList<String> samples = new ArrayList<String>(2000);
 
     private static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
@@ -133,12 +133,15 @@ public class GraphActivity extends BlunoLibrary {
     @Override
     public void onSerialReceived(final String theString) {//Once connection data received, this function will be called
 
-       /* if (numSamples <  maxSamples ){
+        if (samples.size() <  maxSamples ){
             samples.add(theString);
         }
-        else{
-            //processData(samples); */
-            runOnUiThread(new Runnable() {
+        else {
+            int numErrors = processData(samples);
+            System.out.println("Samples correct? " + numErrors);
+        }
+
+            /*runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     //hydrateFrag = (HydrationFragment) getSupportFragmentManager().findFragmentById(R.id.hydration_fragment);
@@ -151,20 +154,31 @@ public class GraphActivity extends BlunoLibrary {
                         hydrateFrag.hydrateDispMsg2(bytesToText(byteArr, true));
                     }
                 }
-            });
+            });*/
 
         //}
 
     }
     //TODO: call filtereing method in this function
-    private void processData(ArrayList<String> data){
-        numSamples = 0;
-        for (String s: data){
-            s.replaceAll("(\\r\\n|\\r)", "\n");
-            byte[] byteArr = s.getBytes();
-            bytesToText(byteArr, true);
+    //this function tests if there is any data lost, where data goes from 0 to val, and then val to 0
+    private int processData(ArrayList<String> data){
+        //numSamples = 0;
+        int prev = Integer.parseInt(samples.get(1)); // start at 1 since data at 0 is garbage
+        int errors = 0;
+        for (int x = 2; x < samples.size(); x++){
+            try{
+                int curr = Integer.parseInt(samples.get(x));
+                if (Math.abs(prev - curr) != 1)
+                    errors++;
+                prev = curr;
+            }
+            catch(NumberFormatException e){ //catch numberFormatException
+                e.printStackTrace();
+                errors++;
+            }
         }
         samples.clear();
+        return errors;
     }
 
     //convert byte array to string
