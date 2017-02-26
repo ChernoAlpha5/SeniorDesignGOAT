@@ -17,6 +17,54 @@
            android:layout_alignParentTop="true"
            android:layout_alignParentStart="true" />
 
+
+       <TextView
+           android:text="Select Vital"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="20dp"
+           android:id="@+id/vitalText"
+           android:layout_below="@+id/scanBtn"
+           android:layout_alignStart="@id/scanBtn" />
+
+       <Spinner
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_below="@+id/scanBtn"
+           android:layout_toRightOf="@id/vitalText"
+           android:layout_marginLeft="90dp"
+           android:layout_marginTop="20dp"
+           android:id="@+id/vitalSpinner" />
+
+       <TextView
+           android:text="Set Time"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_below="@+id/vitalText"
+           android:layout_alignStart="@+id/scanBtn"
+           android:layout_marginTop="20dp"
+           android:id="@+id/timeText" />
+
+       <Spinner
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_toRightOf="@id/timeText"
+           android:layout_alignStart="@id/vitalSpinner"
+           android:layout_below="@+id/vitalText"
+           android:layout_marginTop="20dp"
+           android:id="@+id/timeSpinner" />
+       <Button
+           android:id="@+id/measureBtn"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Measure"
+           android:layout_marginTop="20dp"
+           android:onClick="scanDevices"
+           android:layout_below="@id/timeText"
+           android:layout_alignStart="@+id/scanBtn" />
+
+
+
    </RelativeLayout>
 
     <!--<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
