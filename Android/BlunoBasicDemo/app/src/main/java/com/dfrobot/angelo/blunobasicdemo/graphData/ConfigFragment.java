@@ -17,28 +17,43 @@ import com.dfrobot.angelo.blunobasicdemo.R;
 
 public class ConfigFragment extends Fragment {
     Button scanBtn;
+    View rootView;
+    Spinner vitalSpinner, timeSpinner;
 
     public ConfigFragment() {
         // Required empty public constructor
     }
 
-    Spinner spinner;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        //scanBtn = (Button) findViewById(R.id.scanBtn);
+        rootView = inflater.inflate(R.layout.g_fragment_config, container, false);
 
-        spinner = (Spinner) getView().findViewById(R.id.vitalSpinner);      //must call getView (returns root view) if inside fragment
+        scanBtn = (Button) rootView.findViewById(R.id.scanBtn);
+
+        // create vital spinner
+        vitalSpinner = (Spinner) rootView.findViewById(R.id.vitalSpinner);      //must call getView (returns root view) if inside fragment
          // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getContext(),
+        ArrayAdapter<CharSequence> vitalAdapter = ArrayAdapter.createFromResource(this.getContext(),
                 R.array.vitals_arr, android.R.layout.simple_spinner_item);
          // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        vitalAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
          // Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
+        vitalSpinner.setAdapter(vitalAdapter);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.g_fragment_config, container, false);
+
+        // create time spinner
+        timeSpinner = (Spinner) rootView.findViewById(R.id.timeSpinner);      //must call getView (returns root view) if inside fragment
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> timeAdapter = ArrayAdapter.createFromResource(this.getContext(),
+                R.array.time_arr, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        timeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        timeSpinner.setAdapter(timeAdapter);
+        // Inflate the layout for this fragment
+
+        return rootView;
     }
 
     public void setScanBtn(String text) {

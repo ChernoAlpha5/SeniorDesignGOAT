@@ -70,7 +70,7 @@ public class MainActivity  extends BlunoLibrary {
 
 			}
 		});
-		requestLocationPermissionIfNeeded();
+		//requestLocationPermissionIfNeeded();
 	}
 
 	protected void onResume(){

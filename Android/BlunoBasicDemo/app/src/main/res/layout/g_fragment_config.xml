@@ -44,7 +44,6 @@
            android:layout_alignStart="@+id/scanBtn"
            android:layout_marginTop="20dp"
            android:id="@+id/timeText" />
-
        <Spinner
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
@@ -59,7 +58,6 @@
            android:layout_height="wrap_content"
            android:text="Measure"
            android:layout_marginTop="20dp"
-           android:onClick="scanDevices"
            android:layout_below="@id/timeText"
            android:layout_alignStart="@+id/scanBtn" />
 
