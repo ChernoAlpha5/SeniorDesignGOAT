@@ -40,7 +40,7 @@ public class GraphActivity extends BlunoLibrary {
 
     //data collection variables
     int numSamples = 0;
-    int maxSamples = 500;
+    int maxSamples = 3000;
     ArrayList<String> samples = new ArrayList<String>(2000);
 
     private static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
@@ -163,6 +163,26 @@ public class GraphActivity extends BlunoLibrary {
     //this function tests if there is any data lost, where data goes from 0 to val, and then val to 0
     private int processData(ArrayList<String> data){
         //numSamples = 0;
+        for (int i = 0; i < data.size(); i++){  //ensure no newline characters in string
+            String s = data.get(i);
+            char delineator = '\r';
+            int index = s.indexOf(delineator);
+            if (s.indexOf(delineator) > 0 && s.indexOf(delineator) < (s.length() - 3)){
+                data.remove(i);
+                String[] sArr = s.split("\\r\\n");
+                int currInd = i;
+                for (int x = 0; x < sArr.length; x ++) {
+                    data.add(currInd, sArr[x]);
+                    currInd++;
+                }
+                i = currInd -1; //update index after inserting data
+            }
+            else{
+                data.set(i, data.get(i).replaceAll("\\r\\n", ""));
+            }
+
+        }
+
         int prev = Integer.parseInt(samples.get(1)); // start at 1 since data at 0 is garbage
         int errors = 0;
         for (int x = 2; x < samples.size(); x++){

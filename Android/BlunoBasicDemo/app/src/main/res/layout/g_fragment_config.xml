@@ -25,14 +25,15 @@
            android:layout_marginTop="20dp"
            android:id="@+id/vitalText"
            android:layout_below="@+id/scanBtn"
-           android:layout_alignStart="@id/scanBtn" />
+           android:layout_alignStart="@id/scanBtn"
+           tools:textSize="16sp" />
 
        <Spinner
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:layout_below="@+id/scanBtn"
            android:layout_toRightOf="@id/vitalText"
-           android:layout_marginLeft="90dp"
+           android:layout_marginLeft="30dp"
            android:layout_marginTop="20dp"
            android:id="@+id/vitalSpinner" />
 
@@ -43,7 +44,8 @@
            android:layout_below="@+id/vitalText"
            android:layout_alignStart="@+id/scanBtn"
            android:layout_marginTop="20dp"
-           android:id="@+id/timeText" />
+           android:id="@+id/timeText"
+           tools:textSize="16sp" />
        <Spinner
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
@@ -61,6 +63,14 @@
            android:layout_below="@id/timeText"
            android:layout_alignStart="@+id/scanBtn" />
 
+       <ProgressBar
+           style="?android:attr/progressBarStyleHorizontal"
+           android:layout_width="150dp"
+           android:layout_height="30dp"
+           android:id="@+id/progressBar"
+           android:layout_marginTop="20dp"
+           android:layout_below="@id/timeSpinner"
+           android:layout_alignStart="@id/vitalSpinner" />
 
 
    </RelativeLayout>
