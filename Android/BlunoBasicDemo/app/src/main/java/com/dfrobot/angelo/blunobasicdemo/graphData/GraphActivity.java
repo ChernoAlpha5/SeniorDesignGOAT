@@ -159,6 +159,13 @@ public class GraphActivity extends BlunoLibrary {
         //}
 
     }
+
+    public void sendToBluno(String text){
+         //TODO: check if BT has been connected
+        serialSend(text);				//send the data to the BLUNO
+
+    }
+
     //TODO: call filtereing method in this function
     //this function tests if there is any data lost, where data goes from 0 to val, and then val to 0
     private int processData(ArrayList<String> data){

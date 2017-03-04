@@ -61,7 +61,8 @@
            android:text="Measure"
            android:layout_marginTop="20dp"
            android:layout_below="@id/timeText"
-           android:layout_alignStart="@+id/scanBtn" />
+           android:layout_alignStart="@+id/scanBtn"
+           android:onClick="countdown"/>
 
        <ProgressBar
            style="?android:attr/progressBarStyleHorizontal"
@@ -71,6 +72,17 @@
            android:layout_marginTop="20dp"
            android:layout_below="@id/timeSpinner"
            android:layout_alignStart="@id/vitalSpinner" />
+
+       <TextView
+           android:text="Timer"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="10dp"
+           android:layout_marginTop="10dp"
+           android:layout_toRightOf="@id/progressBar"
+           android:layout_alignTop="@id/measureBtn"
+           android:id="@+id/timer"
+           tools:textSize="16sp" />
 
 
    </RelativeLayout>
