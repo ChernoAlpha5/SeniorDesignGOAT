@@ -85,7 +85,7 @@ public class ConfigFragment extends Fragment {
         if (runCounter == 0){ //prevent 2nd timer from being created before 1st timer finishes
              // convert spinner value (string) to milliseconds
             runCounter++;     //REAL JANKY CODE OVER HERE
-            ((GraphActivity)getActivity()).sendToBluno("h180");
+            ((GraphActivity)getActivity()).sendToBluno("h6");
             measureBtn.setText("cancel");
             String[] minSec = timeSpinner.getSelectedItem().toString().split(":"); //format: "mm:ss" - separate minutes and seconds
             cTime = Integer.parseInt(minSec[0]) * 60000 + Integer.parseInt(minSec[1]) * 1000;    //60000 milliseconds in one minute
@@ -126,6 +126,7 @@ public class ConfigFragment extends Fragment {
         super.onDestroy();
         if (cTimer != null) //avoid memory leak
             cTimer.cancel();
+            measureBtn.setText("measure");
     }
 
     @Override
