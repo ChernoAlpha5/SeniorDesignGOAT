@@ -82,13 +82,19 @@ public class ConfigFragment extends Fragment {
     public void countdown(View v){
         final long cTime;
 
-        if (runCounter == 0){ //prevent 2nd timer from being created before 1st timer finishes
-             // convert spinner value (string) to milliseconds
-            runCounter++;     //REAL JANKY CODE OVER HERE
-            ((GraphActivity)getActivity()).sendToBluno("h6");
+        if (runCounter == 0){ //prevent 2nd timer from being created before 1st timer finished
+            runCounter++;
             measureBtn.setText("cancel");
+             // convert spinner value (string) to milliseconds
             String[] minSec = timeSpinner.getSelectedItem().toString().split(":"); //format: "mm:ss" - separate minutes and seconds
             cTime = Integer.parseInt(minSec[0]) * 60000 + Integer.parseInt(minSec[1]) * 1000;    //60000 milliseconds in one minute
+
+            if (vitalSpinner.getSelectedItem().toString().equals("Respiration")){
+                ((GraphActivity)getActivity()).sendToBluno("r" + cTime/1000);   //tell Bluno how long we are sampling for in seconds
+            }
+            else{
+                ((GraphActivity)getActivity()).sendToBluno("h" + cTime/1000);   //tell Bluno how long we are sampling for in seconds
+            }
             cTimer = new CountDownTimer(cTime, 500) { //1st arg: time length in ms, 2nd arg: interval to call onTick()
 
                 public void onTick(long millisUntilFinished) {
@@ -104,6 +110,7 @@ public class ConfigFragment extends Fragment {
                 }
 
                 public void onFinish() {
+                    measureBtn.setText("measure");
                     progressBar.setProgress(progressBar.getMax());
                     timer.setText("Done!");
                     runCounter = 0;
@@ -111,14 +118,15 @@ public class ConfigFragment extends Fragment {
             }.start();
         }
         else{   //cancel measurements
-            if (cTimer != null)
+            if (cTimer != null){
+                ((GraphActivity)getActivity()).sendToBluno("c");   //tell Bluno to cancel measurements
                 measureBtn.setText("measure");
                 progressBar.setProgress(0);
                 timer.setText("Timer");
                 cTimer.cancel();
                 runCounter = 0;
+            }
         }
-
     }
 
     @Override
