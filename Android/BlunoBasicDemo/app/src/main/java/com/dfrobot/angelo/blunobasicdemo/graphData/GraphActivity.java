@@ -178,7 +178,9 @@ public class GraphActivity extends BlunoLibrary {
         serialSend(text);				//send the data to the BLUNO
 
     }
-
+    public connectionStateEnum getConnectionState(){
+        return mConnectionState;
+    }
     //TODO: call filtereing method in this function
     //this function tests if there is any data lost, where data goes from 0 to val, and then val to 0
     public void processData(int seconds){

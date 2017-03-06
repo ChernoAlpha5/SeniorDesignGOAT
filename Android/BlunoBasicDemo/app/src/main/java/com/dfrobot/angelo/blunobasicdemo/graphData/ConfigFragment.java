@@ -3,6 +3,7 @@ package com.dfrobot.angelo.blunobasicdemo.graphData;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.dfrobot.angelo.blunobasicdemo.BlunoLibrary;
 import com.dfrobot.angelo.blunobasicdemo.R;
 
 /**
@@ -26,6 +28,7 @@ public class ConfigFragment extends Fragment {
     TextView timer;
     CountDownTimer cTimer = null;
     ProgressBar progressBar;
+    Snackbar mySnackbar;
     int runCounter = 0; //if run counter = 0 (when entering section) run counter, else wait
     private Handler mHandler = new Handler();
 
@@ -71,7 +74,7 @@ public class ConfigFragment extends Fragment {
         // Apply the adapter to the spinner
         timeSpinner.setAdapter(timeAdapter);
         // Inflate the layout for this fragment
-
+       // mySnackbar = Snackbar.make(rootView, R.string.connect_first, Snackbar.LENGTH_SHORT);
         return rootView;
     }
 
@@ -80,54 +83,67 @@ public class ConfigFragment extends Fragment {
     }
 
     public void countdown(View v){
-        final long cTime;
+         //ensure smartphone is connected to Bluno before measuring
+        if (((GraphActivity)getActivity()).getConnectionState() == BlunoLibrary.connectionStateEnum.isConnected){
+            if (runCounter == 0){ //prevent 2nd timer from being created before 1st timer finished
+                final long cTime;
+                runCounter++;
+                measureBtn.setText("cancel");
+                // convert spinner value (string) to milliseconds
+                String[] minSec = timeSpinner.getSelectedItem().toString().split(":"); //format: "mm:ss" - separate minutes and seconds
+                cTime = Integer.parseInt(minSec[0]) * 60000 + Integer.parseInt(minSec[1]) * 1000;    //cTime is time to sample in milliseconds
 
-        if (runCounter == 0){ //prevent 2nd timer from being created before 1st timer finished
-            runCounter++;
-            measureBtn.setText("cancel");
-             // convert spinner value (string) to milliseconds
-            String[] minSec = timeSpinner.getSelectedItem().toString().split(":"); //format: "mm:ss" - separate minutes and seconds
-            cTime = Integer.parseInt(minSec[0]) * 60000 + Integer.parseInt(minSec[1]) * 1000;    //cTime is time to sample in milliseconds
-
-            if (vitalSpinner.getSelectedItem().toString().equals("Respiration")){
-                ((GraphActivity)getActivity()).sendToBluno("r" + cTime/1000);   //tell Bluno how long we are sampling for in seconds
-            }
-            else{
-                ((GraphActivity)getActivity()).sendToBluno("h" + cTime/1000);   //tell Bluno how long we are sampling for in seconds
-            }
-            cTimer = new CountDownTimer(cTime, 500) { //1st arg: time length in ms, 2nd arg: interval to call onTick()
-
-                public void onTick(long millisUntilFinished) {
-                    long mins =  millisUntilFinished / 60000;
-                    long secs = (millisUntilFinished % 60000) / 1000;
-                    String strSecs = secs + "";
-                    if (secs < 10)
-                        strSecs = "0" + secs;
-                     //timer.setText(/*"seconds remaining: " + */ millisUntilFinished/ 60000 + ":" + millisUntilFinished / 1000);
-                    timer.setText(mins + ":" + strSecs);
-                    progressBar.setProgress(progressBar.getMax() - (int)(100* (float)millisUntilFinished / cTime));
+                if (vitalSpinner.getSelectedItem().toString().equals("Respiration")){
+                    ((GraphActivity)getActivity()).sendToBluno("r" + cTime/1000);   //tell Bluno how long we are sampling for in seconds
                 }
+                else{
+                    ((GraphActivity)getActivity()).sendToBluno("h" + cTime/1000);   //tell Bluno how long we are sampling for in seconds
+                }
+                cTimer = new CountDownTimer(cTime, 500) { //1st arg: time length in ms, 2nd arg: interval to call onTick()
 
-                public void onFinish() {
+                    public void onTick(long millisUntilFinished) {
+                        long mins =  millisUntilFinished / 60000;
+                        long secs = (millisUntilFinished % 60000) / 1000;
+                        String strSecs = secs + "";
+                        if (secs < 10)
+                            strSecs = "0" + secs;
+                        //timer.setText(/*"seconds remaining: " + */ millisUntilFinished/ 60000 + ":" + millisUntilFinished / 1000);
+                        timer.setText(mins + ":" + strSecs);
+                        progressBar.setProgress(progressBar.getMax() - (int)(100* (float)millisUntilFinished / cTime));
+                    }
+
+                    public void onFinish() {
+                        measureBtn.setText("measure");
+                        progressBar.setProgress(progressBar.getMax());
+                        timer.setText("Done!");
+                        runCounter = 0;
+                        ((GraphActivity)getActivity()).processData((int)(cTime/1000));
+                    }
+                }.start();
+            }
+            else{   //cancel measurements
+                if (cTimer != null){
+                    ((GraphActivity)getActivity()).sendToBluno("c");   //tell Bluno to cancel measurements
+                    ((GraphActivity)getActivity()).clearData();
                     measureBtn.setText("measure");
-                    progressBar.setProgress(progressBar.getMax());
-                    timer.setText("Done!");
+                    progressBar.setProgress(0);
+                    timer.setText("Timer");
+                    cTimer.cancel();
                     runCounter = 0;
-                    ((GraphActivity)getActivity()).processData((int)(cTime/1000));
                 }
-            }.start();
-        }
-        else{   //cancel measurements
-            if (cTimer != null){
-                ((GraphActivity)getActivity()).sendToBluno("c");   //tell Bluno to cancel measurements
-                ((GraphActivity)getActivity()).clearData();
-                measureBtn.setText("measure");
-                progressBar.setProgress(0);
-                timer.setText("Timer");
-                cTimer.cancel();
-                runCounter = 0;
             }
         }
+        else{ //display message telling user to connect before measuring
+            mySnackbar.show();
+        }
+
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+         //TODO: CREATE COORDINATOR LAYOUT FOR POPUP???
+        mySnackbar = Snackbar.make(rootView, R.string.connect_first, Snackbar.LENGTH_LONG);
     }
 
     @Override

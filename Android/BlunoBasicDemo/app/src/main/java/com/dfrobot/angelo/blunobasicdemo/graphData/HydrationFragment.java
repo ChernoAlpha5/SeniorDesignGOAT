@@ -212,7 +212,6 @@ public class HydrationFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-
     }
 
     @Override
