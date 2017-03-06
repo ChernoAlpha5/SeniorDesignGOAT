@@ -87,7 +87,7 @@ public class ConfigFragment extends Fragment {
             measureBtn.setText("cancel");
              // convert spinner value (string) to milliseconds
             String[] minSec = timeSpinner.getSelectedItem().toString().split(":"); //format: "mm:ss" - separate minutes and seconds
-            cTime = Integer.parseInt(minSec[0]) * 60000 + Integer.parseInt(minSec[1]) * 1000;    //60000 milliseconds in one minute
+            cTime = Integer.parseInt(minSec[0]) * 60000 + Integer.parseInt(minSec[1]) * 1000;    //cTime is time to sample in milliseconds
 
             if (vitalSpinner.getSelectedItem().toString().equals("Respiration")){
                 ((GraphActivity)getActivity()).sendToBluno("r" + cTime/1000);   //tell Bluno how long we are sampling for in seconds
@@ -103,10 +103,9 @@ public class ConfigFragment extends Fragment {
                     String strSecs = secs + "";
                     if (secs < 10)
                         strSecs = "0" + secs;
-                    //timer.setText(/*"seconds remaining: " + */ millisUntilFinished/ 60000 + ":" + millisUntilFinished / 1000);
+                     //timer.setText(/*"seconds remaining: " + */ millisUntilFinished/ 60000 + ":" + millisUntilFinished / 1000);
                     timer.setText(mins + ":" + strSecs);
-                    //here you can have your logic to set text to edittext
-                    progressBar.setProgress(progressBar.getMax() - (int)(100* (float)millisUntilFinished / cTime));        //not working!!!
+                    progressBar.setProgress(progressBar.getMax() - (int)(100* (float)millisUntilFinished / cTime));
                 }
 
                 public void onFinish() {
@@ -114,6 +113,7 @@ public class ConfigFragment extends Fragment {
                     progressBar.setProgress(progressBar.getMax());
                     timer.setText("Done!");
                     runCounter = 0;
+                    ((GraphActivity)getActivity()).processData((int)(cTime/1000));
                 }
             }.start();
         }
