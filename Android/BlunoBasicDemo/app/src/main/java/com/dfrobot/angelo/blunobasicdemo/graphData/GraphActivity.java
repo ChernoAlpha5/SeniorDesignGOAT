@@ -173,30 +173,33 @@ public class GraphActivity extends BlunoLibrary {
     public void processData(int seconds){
         filterData fData = new filterData();
          //format data to remove \\r\\n characters and discard any data less than <threshold>
-        for (int i = 0; i < samples.size(); i++){  //ensure no newline characters in string
+        for (int i = 1; i < samples.size(); i++){  //ensure no newline characters in string
             String s = samples.get(i);
             char delineator = '\r';
             //int index = s.indexOf(delineator);
              //data error - sometimes there are 2+ datas per entry in data ArrayList
-            if (s.indexOf(delineator) > 0 && s.indexOf(delineator) < (s.length() - 3)){
-                //data.remove(i);
-                String[] sArr = s.split("\\r\\n");
-                int currInd = i;
-                for (int x = 0; x < sArr.length; x ++) {
-                    Float f = Float.parseFloat(sArr[x]);
+            try{
+                if (s.indexOf(delineator) > 0 && s.indexOf(delineator) < (s.length() - 3)){
+                    //data.remove(i);
+                    String[] sArr = s.split("\\r\\n");
+                    int currInd = i;
+                    for (int x = 0; x < sArr.length; x ++) {
+                        Float f = Float.parseFloat(sArr[x]);
+                        if (f >= threshold){
+                            rData.add(/*currInd,*/ f);
+                            currInd++;
+                        }
+                    }
+                    i = currInd -1; //update index after inserting data
+                }
+                else{
+                    Float f = Float.parseFloat(samples.get(i).replaceAll("\\r\\n", ""));
                     if (f >= threshold){
-                        rData.add(currInd, f);
-                        currInd++;
+                        rData.add(f);
                     }
                 }
-                i = currInd -1; //update index after inserting data
             }
-            else{
-                Float f = Float.parseFloat(samples.get(i).replaceAll("\\r\\n", ""));
-                if (f >= threshold){
-                    rData.add(f);
-                }
-            }
+            catch(NumberFormatException e){e.printStackTrace();}    //in case the number is not a valid float
         }
         int breaths = 0;
         if (rData.size() > 0)

@@ -195,7 +195,7 @@ public class HydrationFragment extends Fragment {
         String currMsg = hydrationLvl.getText().toString();
         try{
 
-            Integer intHydrateLvl = Integer.parseInt(data);
+            Float intHydrateLvl = Float.parseFloat(data);
             DateFormat df = new SimpleDateFormat("EEE, d MMM, HH:mm");
             String mydate = df.format(Calendar.getInstance().getTime());
             hydrationLvl.setText(intHydrateLvl  + "% as of " + mydate);
