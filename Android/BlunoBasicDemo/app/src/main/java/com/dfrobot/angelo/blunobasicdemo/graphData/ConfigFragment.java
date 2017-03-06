@@ -120,6 +120,7 @@ public class ConfigFragment extends Fragment {
         else{   //cancel measurements
             if (cTimer != null){
                 ((GraphActivity)getActivity()).sendToBluno("c");   //tell Bluno to cancel measurements
+                ((GraphActivity)getActivity()).clearData();
                 measureBtn.setText("measure");
                 progressBar.setProgress(0);
                 timer.setText("Timer");

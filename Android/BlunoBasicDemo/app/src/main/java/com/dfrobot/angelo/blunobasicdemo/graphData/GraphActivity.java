@@ -108,24 +108,35 @@ public class GraphActivity extends BlunoLibrary {
 
     @Override
     public void onConectionStateChange(connectionStateEnum theConnectionState) {//Once connection state changes, this function will be called
+        String connectionState = null;
         switch (theConnectionState) {											//Four connection state
+
             case isConnected:
-                scanBtn.setText("Connected");   //TODO: FIX BUTTON CHANGES
+                //scanBtn.setText("Connected");   //TODO: FIX BUTTON CHANGES
+                connectionState = "Connected";
                 break;
             case isConnecting:
-                scanBtn.setText("Connecting");
+                //scanBtn.setText("Connecting");
+                connectionState = "Connecting";
                 break;
             case isToScan:
-                scanBtn.setText("Scan");
+                //scanBtn.setText("Scan");
+                connectionState = "Scan";
                 break;
             case isScanning:
-                scanBtn.setText("Scanning");
+                //scanBtn.setText("Scanning");
+                connectionState = "Scanning";
                 break;
             case isDisconnecting:
-                scanBtn.setText("isDisconnecting");
+                connectionState = "isDisconnecting";
+                //scanBtn.setText("isDisconnecting");
                 break;
             default:
                 break;
+        }
+        if (connectionState != null){
+            configFrag = (ConfigFragment) viewPagerAdapter.getFragment(0);
+            configFrag.setScanBtn(connectionState);
         }
     }
     public void scanDevices(View v){
@@ -245,6 +256,10 @@ public class GraphActivity extends BlunoLibrary {
         return errors;*/
     }
 
+    public void clearData(){
+        rData.clear();
+        samples.clear();
+    }
     //convert byte array to string
     private String bytesToText(byte[] bytes, boolean simplifyNewLine) {
         String text = new String(bytes, Charset.forName("UTF-8"));
