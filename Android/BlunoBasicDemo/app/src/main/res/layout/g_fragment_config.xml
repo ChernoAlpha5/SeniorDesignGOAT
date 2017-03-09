@@ -51,6 +51,7 @@
            android:layout_height="wrap_content"
            android:layout_toRightOf="@id/timeText"
            android:layout_alignStart="@id/vitalSpinner"
+           android:layout_alignEnd="@id/vitalSpinner"
            android:layout_below="@+id/vitalText"
            android:layout_marginTop="20dp"
            android:id="@+id/timeSpinner" />

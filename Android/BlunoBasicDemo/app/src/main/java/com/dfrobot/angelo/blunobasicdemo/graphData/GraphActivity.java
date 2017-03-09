@@ -136,7 +136,8 @@ public class GraphActivity extends BlunoLibrary {
         }
         if (connectionState != null){
             configFrag = (ConfigFragment) viewPagerAdapter.getFragment(0);
-            configFrag.setScanBtn(connectionState);
+            if (configFrag !=null)
+                configFrag.setScanBtn(connectionState);
         }
     }
     public void scanDevices(View v){

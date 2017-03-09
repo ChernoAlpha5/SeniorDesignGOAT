@@ -3,6 +3,8 @@ package com.dfrobot.angelo.blunobasicdemo.graphData;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -17,6 +19,8 @@ import android.widget.TextView;
 import com.dfrobot.angelo.blunobasicdemo.BlunoLibrary;
 import com.dfrobot.angelo.blunobasicdemo.R;
 
+import static android.content.Context.POWER_SERVICE;
+
 /**
  * Created by Andrew on 2/19/2017.
  */
@@ -29,6 +33,7 @@ public class ConfigFragment extends Fragment {
     CountDownTimer cTimer = null;
     ProgressBar progressBar;
     Snackbar mySnackbar;
+    //WakeLock wakeLock;
     int runCounter = 0; //if run counter = 0 (when entering section) run counter, else wait
     private Handler mHandler = new Handler();
 
@@ -86,6 +91,11 @@ public class ConfigFragment extends Fragment {
          //ensure smartphone is connected to Bluno before measuring
         if (((GraphActivity)getActivity()).getConnectionState() == BlunoLibrary.connectionStateEnum.isConnected){
             if (runCounter == 0){ //prevent 2nd timer from being created before 1st timer finished
+                 //acquire wakelock to prevent CPU from going to sleep during BT transmission
+                /*PowerManager powerManager = (PowerManager) getActivity().getSystemService(POWER_SERVICE);
+                wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BTwakelock");
+                wakeLock.acquire();*/
+
                 final long cTime;
                 runCounter++;
                 measureBtn.setText("cancel");
@@ -118,11 +128,15 @@ public class ConfigFragment extends Fragment {
                         timer.setText("Done!");
                         runCounter = 0;
                         ((GraphActivity)getActivity()).processData((int)(cTime/1000));
+                        /*if (wakeLock != null)
+                            wakeLock.release();*/
                     }
                 }.start();
             }
             else{   //cancel measurements
                 if (cTimer != null){
+                    /*if (wakeLock != null)
+                        wakeLock.release();*/
                     ((GraphActivity)getActivity()).sendToBluno("c");   //tell Bluno to cancel measurements
                     ((GraphActivity)getActivity()).clearData();
                     measureBtn.setText("measure");
@@ -149,9 +163,13 @@ public class ConfigFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (cTimer != null) //avoid memory leak
+        if (cTimer != null){
+            //avoid memory leak
             cTimer.cancel();
-            measureBtn.setText("measure");
+        }
+        /*if (wakeLock != null){
+            wakeLock.release();
+        }*/
     }
 
     @Override
