@@ -25,7 +25,7 @@ public class filterData {
             //y.remove(i);
             y.remove(0);    //TODO: IS THIS RIGHT? keep removing first element since array shifts after each removal
         }
-
+         //TODO: CATCH INDEX OUT OF BOUNDS EXCEPTIONS (SET MINIMUM)!!!
         for (int i = 1; i < y.size() - 1; i++) { //does not check first and last value
             grtThanFormer = y.get(i - 1) < y.get(i);
             grtThanLatter = y.get(i + 1) < y.get(i);

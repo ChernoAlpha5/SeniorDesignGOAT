@@ -1,12 +1,13 @@
 
    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:ProgressWheel="http://schemas.android.com/apk/res-auto"
         android:id="@+id/f_Config"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="com.dfrobot.angelo.blunobasicdemo.graphData.ConfigFragment">
 
-       <Button
+       <!--Button
            android:id="@+id/scanBtn"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
@@ -15,7 +16,7 @@
            android:layout_marginTop="120dp"
            android:onClick="scanDevices"
            android:layout_alignParentTop="true"
-           android:layout_alignParentStart="true" />
+           android:layout_alignParentStart="true" /-->
 
 
        <TextView
@@ -59,22 +60,22 @@
            android:id="@+id/measureBtn"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:text="Measure"
+           android:text="Scan"
            android:layout_marginTop="20dp"
            android:layout_below="@id/timeText"
-           android:layout_alignStart="@+id/scanBtn"
+           android:layout_centerInParent="true"
            android:onClick="countdown"/>
 
-       <ProgressBar
+       <!--ProgressBar
            style="?android:attr/progressBarStyleHorizontal"
            android:layout_width="150dp"
            android:layout_height="30dp"
            android:id="@+id/progressBar"
            android:layout_marginTop="20dp"
            android:layout_below="@id/timeSpinner"
-           android:layout_alignStart="@id/vitalSpinner" />
+           android:layout_alignStart="@id/vitalSpinner" /-->
 
-       <TextView
+       <!--TextView
            android:text="Timer"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
@@ -83,7 +84,21 @@
            android:layout_toRightOf="@id/progressBar"
            android:layout_alignTop="@id/measureBtn"
            android:id="@+id/timer"
-           tools:textSize="16sp" />
+           tools:textSize="16sp" /-->
+
+       <com.todddavies.components.progressbar.ProgressWheel
+           android:id="@+id/pw_spinner"
+           android:layout_width="200dp"
+           android:layout_height="200dp"
+           android:layout_centerInParent="true"
+           ProgressWheel:pwText="0:00"
+           ProgressWheel:pwTextColor="#222"
+           ProgressWheel:pwTextSize="50sp"
+           ProgressWheel:pwRimColor="#330097D6"
+           ProgressWheel:pwBarLength="60dp"
+           ProgressWheel:pwBarColor="#0097D6"
+           ProgressWheel:pwBarWidth="5dp"
+           ProgressWheel:pwRimWidth="2dp" />
 
 
    </RelativeLayout>

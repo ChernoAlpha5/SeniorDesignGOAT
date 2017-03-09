@@ -26,7 +26,7 @@
         <item>Hydration</item>
     </string-array>
 
-    <string name = "connect_first">"Please connect to Bluno before measuring</string>
+    <string name = "connect_first">"Error: please connect to Bluno before measuring</string>
     <string-array name="time_arr">
         <item>0:08</item>
         <item>2:00</item>

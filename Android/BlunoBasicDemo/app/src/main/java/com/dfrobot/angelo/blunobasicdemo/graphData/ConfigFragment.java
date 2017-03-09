@@ -15,9 +15,9 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import com.dfrobot.angelo.blunobasicdemo.BlunoLibrary;
 import com.dfrobot.angelo.blunobasicdemo.R;
+import com.todddavies.components.progressbar.ProgressWheel;
 
 import static android.content.Context.POWER_SERVICE;
 
@@ -29,10 +29,11 @@ public class ConfigFragment extends Fragment {
     Button scanBtn, measureBtn;
     View rootView;
     Spinner vitalSpinner, timeSpinner;
-    TextView timer;
+    //TextView timer;
     CountDownTimer cTimer = null;
-    ProgressBar progressBar;
+    //ProgressBar progressBar;
     Snackbar mySnackbar;
+    ProgressWheel progWheel;
     //WakeLock wakeLock;
     int runCounter = 0; //if run counter = 0 (when entering section) run counter, else wait
     private Handler mHandler = new Handler();
@@ -47,9 +48,9 @@ public class ConfigFragment extends Fragment {
         rootView = inflater.inflate(R.layout.g_fragment_config, container, false);
 
         scanBtn = (Button) rootView.findViewById(R.id.scanBtn);
-        timer = (TextView) rootView.findViewById(R.id.timer);
+        //timer = (TextView) rootView.findViewById(R.id.timer);
         measureBtn = (Button) rootView.findViewById(R.id.measureBtn);
-        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
+        //progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
 
         measureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,18 +81,22 @@ public class ConfigFragment extends Fragment {
         timeSpinner.setAdapter(timeAdapter);
         // Inflate the layout for this fragment
        // mySnackbar = Snackbar.make(rootView, R.string.connect_first, Snackbar.LENGTH_SHORT);
+        progWheel = (ProgressWheel) rootView.findViewById(R.id.pw_spinner);
         return rootView;
     }
 
     public void setScanBtn(String text) {
-        scanBtn.setText(text);
+        measureBtn.setText(text);
     }
 
-    public void countdown(View v){
-         //ensure smartphone is connected to Bluno before measuring
-        if (((GraphActivity)getActivity()).getConnectionState() == BlunoLibrary.connectionStateEnum.isConnected){
-            if (runCounter == 0){ //prevent 2nd timer from being created before 1st timer finished
-                 //acquire wakelock to prevent CPU from going to sleep during BT transmission
+    public void countdown(View v) {
+        //ensure smartphone is connected to Bluno before measuring
+        if (!(((GraphActivity) getActivity()).getConnectionState() == BlunoLibrary.connectionStateEnum.isConnected)) {
+            ((GraphActivity) getActivity()).scanDevices(v);
+        }
+        if ((((GraphActivity) getActivity()).getConnectionState() == BlunoLibrary.connectionStateEnum.isConnected)) {
+            if (runCounter == 0) { //prevent 2nd timer from being created before 1st timer finished
+                //acquire wakelock to prevent CPU from going to sleep during BT transmission
                 /*PowerManager powerManager = (PowerManager) getActivity().getSystemService(POWER_SERVICE);
                 wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BTwakelock");
                 wakeLock.acquire();*/
@@ -99,57 +104,68 @@ public class ConfigFragment extends Fragment {
                 final long cTime;
                 runCounter++;
                 measureBtn.setText("cancel");
+                final int cntInterval = 500;
                 // convert spinner value (string) to milliseconds
                 String[] minSec = timeSpinner.getSelectedItem().toString().split(":"); //format: "mm:ss" - separate minutes and seconds
                 cTime = Integer.parseInt(minSec[0]) * 60000 + Integer.parseInt(minSec[1]) * 1000;    //cTime is time to sample in milliseconds
 
-                if (vitalSpinner.getSelectedItem().toString().equals("Respiration")){
-                    ((GraphActivity)getActivity()).sendToBluno("r" + cTime/1000);   //tell Bluno how long we are sampling for in seconds
+                if (vitalSpinner.getSelectedItem().toString().equals("Respiration")) {
+                    ((GraphActivity) getActivity()).sendToBluno("r" + cTime / 1000);   //tell Bluno how long we are sampling for in seconds
+                } else {
+                    ((GraphActivity) getActivity()).sendToBluno("h" + cTime / 1000);   //tell Bluno how long we are sampling for in seconds
                 }
-                else{
-                    ((GraphActivity)getActivity()).sendToBluno("h" + cTime/1000);   //tell Bluno how long we are sampling for in seconds
-                }
-                cTimer = new CountDownTimer(cTime, 500) { //1st arg: time length in ms, 2nd arg: interval to call onTick()
+                cTimer = new CountDownTimer(cTime, cntInterval) { //1st arg: time length in ms, 2nd arg: interval to call onTick()
+                    float currProg = 0;
+                    float prevProg = 0;
 
                     public void onTick(long millisUntilFinished) {
-                        long mins =  millisUntilFinished / 60000;
+                        long mins = millisUntilFinished / 60000;
                         long secs = (millisUntilFinished % 60000) / 1000;
+                        int divider = 1000 / cntInterval;
                         String strSecs = secs + "";
                         if (secs < 10)
                             strSecs = "0" + secs;
-                        //timer.setText(/*"seconds remaining: " + */ millisUntilFinished/ 60000 + ":" + millisUntilFinished / 1000);
-                        timer.setText(mins + ":" + strSecs);
-                        progressBar.setProgress(progressBar.getMax() - (int)(100* (float)millisUntilFinished / cTime));
+
+                        //timer.setText(mins + ":" + strSecs);
+                        //progressBar.setProgress(progressBar.getMax() - (int)(100* (float)millisUntilFinished / cTime));
+                        currProg = 360 - 360 * ((float) millisUntilFinished / cTime);
+                        progWheel.setProgress((int) (currProg + 0.5));   //round to nearest int
+                        progWheel.setText(mins + ":" + strSecs);
                     }
 
                     public void onFinish() {
                         measureBtn.setText("measure");
-                        progressBar.setProgress(progressBar.getMax());
-                        timer.setText("Done!");
+                        //progressBar.setProgress(progressBar.getMax());
+                        progWheel.setProgress(360);
+                        progWheel.setText("0:00");
+                        //timer.setText("Done!");
                         runCounter = 0;
-                        ((GraphActivity)getActivity()).processData((int)(cTime/1000));
+                        ((GraphActivity) getActivity()).processData((int) (cTime / 1000));
                         /*if (wakeLock != null)
                             wakeLock.release();*/
                     }
                 }.start();
-            }
-            else{   //cancel measurements
-                if (cTimer != null){
+            } else {   //cancel measurements
+                if (cTimer != null) {
                     /*if (wakeLock != null)
                         wakeLock.release();*/
-                    ((GraphActivity)getActivity()).sendToBluno("c");   //tell Bluno to cancel measurements
-                    ((GraphActivity)getActivity()).clearData();
+                    ((GraphActivity) getActivity()).sendToBluno("c");   //tell Bluno to cancel measurements
+                    ((GraphActivity) getActivity()).clearData();
                     measureBtn.setText("measure");
-                    progressBar.setProgress(0);
-                    timer.setText("Timer");
+                    //progressBar.setProgress(0);
+
+                    //timer.setText("Timer");
+                    progWheel.setProgress(0);
+                    progWheel.setText("0:00");
                     cTimer.cancel();
                     runCounter = 0;
                 }
             }
         }
-        else{ //display message telling user to connect before measuring
+
+ /*       else{ //display error message telling user to connect before measuring
             mySnackbar.show();
-        }
+        }*/
 
     }
 

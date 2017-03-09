@@ -112,8 +112,8 @@ public class GraphActivity extends BlunoLibrary {
         switch (theConnectionState) {											//Four connection state
 
             case isConnected:
-                //scanBtn.setText("Connected");   //TODO: FIX BUTTON CHANGES
-                connectionState = "Connected";
+                //scanBtn.setText("Connected");
+                connectionState = "Measure";
                 break;
             case isConnecting:
                 //scanBtn.setText("Connecting");
