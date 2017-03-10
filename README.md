@@ -1,5 +1,5 @@
 # SeniorDesignGOAT
-Senior Design band aid project for Dr. Chen.
+University of Texas ECE Senior Design Band Aid Project, sponsored by Dr. Ray Chen.
 
-Adafruit app source code lol:
-https://github.com/adafruit/Bluefruit_LE_Connect_Android
+Current Android app: BlunoBasicDemo
+Current Ardiuno sketch: HearbeatPlotter_v4
