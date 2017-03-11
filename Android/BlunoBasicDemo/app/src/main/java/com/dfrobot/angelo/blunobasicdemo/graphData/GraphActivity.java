@@ -32,7 +32,7 @@ public class GraphActivity extends BlunoLibrary {
     HydrationFragment hydrateFrag;
     RespirationFragment respirationFrag;
     ConfigFragment configFrag;
-    Button scanBtn;
+    //Button scanBtn;
 
     // hydration plot variables
     ArrayList<String> hXAXES = new ArrayList<String>();
@@ -63,7 +63,7 @@ public class GraphActivity extends BlunoLibrary {
         hydrateFrag = new HydrationFragment();
         respirationFrag = new RespirationFragment();
         configFrag = new ConfigFragment();
-        scanBtn = (Button) findViewById(R.id.scanBtn);
+        //scanBtn = (Button) findViewById(R.id.scanBtn);
         viewPagerAdapter.addFragments(configFrag, "Configure");
         viewPagerAdapter.addFragments(hydrateFrag, "Hydration");
         viewPagerAdapter.addFragments(respirationFrag, "Respiration");

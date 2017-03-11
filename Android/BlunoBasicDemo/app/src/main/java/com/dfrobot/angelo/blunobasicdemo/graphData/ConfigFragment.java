@@ -1,5 +1,6 @@
 package com.dfrobot.angelo.blunobasicdemo.graphData;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -26,8 +27,9 @@ import static android.content.Context.POWER_SERVICE;
  */
 
 public class ConfigFragment extends Fragment {
-    Button scanBtn, measureBtn;
-    View rootView;
+    //Button scanBtn;
+    Button measureBtn, vitalGoBtn;
+    View rootView /*, popupView*/;
     Spinner vitalSpinner, timeSpinner;
     //TextView timer;
     CountDownTimer cTimer = null;
@@ -46,8 +48,8 @@ public class ConfigFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.g_fragment_config, container, false);
-
-        scanBtn = (Button) rootView.findViewById(R.id.scanBtn);
+        //popupView = inflater.inflate(R.layout.vital_popup, container, false);
+        //scanBtn = (Button) rootView.findViewById(R.id.scanBtn);
         //timer = (TextView) rootView.findViewById(R.id.timer);
         measureBtn = (Button) rootView.findViewById(R.id.measureBtn);
         //progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
@@ -55,31 +57,65 @@ public class ConfigFragment extends Fragment {
         measureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //setContentView(R.layout.g_activity_graph);
-                countdown(v);
+                if (!(((GraphActivity) getActivity()).getConnectionState() == BlunoLibrary.connectionStateEnum.isConnected)) {
+                    ((GraphActivity) getActivity()).scanDevices(v);
+                }
+                else if (runCounter > 0){
+                    //else {   //cancel measurements
+                        if (cTimer != null) {
+                    /*if (wakeLock != null)
+                        wakeLock.release();*/
+                            ((GraphActivity) getActivity()).sendToBluno("c");   //tell Bluno to cancel measurements
+                            ((GraphActivity) getActivity()).clearData();
+                            measureBtn.setText("measure");
+                            //progressBar.setProgress(0);
+
+                            //timer.setText("Timer");
+                            progWheel.setProgress(0);
+                            progWheel.setText("0:00");
+                            cTimer.cancel();
+                            runCounter = 0;
+                        }
+                    //}
+                }
+                else{
+                    final Dialog vitalDialog = new Dialog(getContext());
+                    vitalDialog.setTitle("Measurement Setup");
+                    vitalDialog.setContentView(R.layout.vital_popup);
+                    vitalDialog.show();
+
+                    // create vital spinner
+                    vitalSpinner = (Spinner) vitalDialog.findViewById(R.id.vitalSpinner);      //must call getView (returns root view) if inside fragment
+                    // Create an ArrayAdapter using the string array and a default spinner layout
+                    ArrayAdapter<CharSequence> vitalAdapter = ArrayAdapter.createFromResource(getContext(), R.array.vitals_arr, android.R.layout.simple_spinner_item);
+                    // Specify the layout to use when the list of choices appears
+                    vitalAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    // Apply the adapter to the spinner
+                    vitalSpinner.setAdapter(vitalAdapter);
+
+                    // create time spinner (same process as vital spinner)
+                    timeSpinner = (Spinner) vitalDialog.findViewById(R.id.timeSpinner);
+                    ArrayAdapter<CharSequence> timeAdapter = ArrayAdapter.createFromResource(getContext(), R.array.time_arr, android.R.layout.simple_spinner_item);
+                    timeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    timeSpinner.setAdapter(timeAdapter);
+
+                    vitalGoBtn = (Button) vitalDialog.findViewById(R.id.vitalGoBtn);
+                    vitalGoBtn.setOnClickListener(new View.OnClickListener(){
+                        public void onClick( View v){
+                            vitalDialog.dismiss();
+                            countdown(v);
+                        }
+
+                    });
+                    //setContentView(R.layout.g_activity_graph);
+
+
+                }
+
             }
         });
-        // create vital spinner
-        vitalSpinner = (Spinner) rootView.findViewById(R.id.vitalSpinner);      //must call getView (returns root view) if inside fragment
-         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> vitalAdapter = ArrayAdapter.createFromResource(this.getContext(),
-                R.array.vitals_arr, android.R.layout.simple_spinner_item);
-         // Specify the layout to use when the list of choices appears
-        vitalAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-         // Apply the adapter to the spinner
-        vitalSpinner.setAdapter(vitalAdapter);
-        // Inflate the layout for this fragment
 
-        // create time spinner
-        timeSpinner = (Spinner) rootView.findViewById(R.id.timeSpinner);      //must call getView (returns root view) if inside fragment
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> timeAdapter = ArrayAdapter.createFromResource(this.getContext(),
-                R.array.time_arr, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        timeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
-        timeSpinner.setAdapter(timeAdapter);
-        // Inflate the layout for this fragment
+
        // mySnackbar = Snackbar.make(rootView, R.string.connect_first, Snackbar.LENGTH_SHORT);
         progWheel = (ProgressWheel) rootView.findViewById(R.id.pw_spinner);
         return rootView;
@@ -91,9 +127,9 @@ public class ConfigFragment extends Fragment {
 
     public void countdown(View v) {
         //ensure smartphone is connected to Bluno before measuring
-        if (!(((GraphActivity) getActivity()).getConnectionState() == BlunoLibrary.connectionStateEnum.isConnected)) {
+       /* if (!(((GraphActivity) getActivity()).getConnectionState() == BlunoLibrary.connectionStateEnum.isConnected)) {
             ((GraphActivity) getActivity()).scanDevices(v);
-        }
+        }*/
         if ((((GraphActivity) getActivity()).getConnectionState() == BlunoLibrary.connectionStateEnum.isConnected)) {
             if (runCounter == 0) { //prevent 2nd timer from being created before 1st timer finished
                 //acquire wakelock to prevent CPU from going to sleep during BT transmission
@@ -145,21 +181,6 @@ public class ConfigFragment extends Fragment {
                             wakeLock.release();*/
                     }
                 }.start();
-            } else {   //cancel measurements
-                if (cTimer != null) {
-                    /*if (wakeLock != null)
-                        wakeLock.release();*/
-                    ((GraphActivity) getActivity()).sendToBluno("c");   //tell Bluno to cancel measurements
-                    ((GraphActivity) getActivity()).clearData();
-                    measureBtn.setText("measure");
-                    //progressBar.setProgress(0);
-
-                    //timer.setText("Timer");
-                    progWheel.setProgress(0);
-                    progWheel.setText("0:00");
-                    cTimer.cancel();
-                    runCounter = 0;
-                }
             }
         }
 
