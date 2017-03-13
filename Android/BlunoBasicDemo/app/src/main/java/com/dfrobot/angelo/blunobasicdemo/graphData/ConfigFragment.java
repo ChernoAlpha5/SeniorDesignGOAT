@@ -31,7 +31,7 @@ import static android.content.Context.POWER_SERVICE;
 
 public class ConfigFragment extends Fragment {
     //Button scanBtn;
-    Button measureBtn, vitalGoBtn;
+    Button measureBtn, vitalGoBtn, vitalCancelBtn ;
     View rootView;
     Spinner vitalSpinner, timeSpinner;
     //TextView timer;
@@ -116,6 +116,14 @@ public class ConfigFragment extends Fragment {
                         }
 
                     });
+
+                    vitalCancelBtn = (Button) vitalDialog.findViewById(R.id.vitalCancelBtn);
+                    vitalCancelBtn.setOnClickListener(new View.OnClickListener(){
+                        public void onClick( View v){
+                            vitalDialog.dismiss();
+                        }
+
+                    });
                     //setContentView(R.layout.activity_graph);
 
                 }
@@ -129,19 +137,23 @@ public class ConfigFragment extends Fragment {
 
          /* If the Fragment was destroyed inbetween (screen rotation), we need to recover the savedState first */
          /* However, if it was not, it stays in the instance from the last onDestroyView() and we don't want to overwrite it */
-        /*if(savedInstanceState != null && savedState == null) {
+        if(savedInstanceState != null && savedState == null) {
             savedState = savedInstanceState.getBundle("configFragSavedState");
         }
         if(savedState != null) {
-            measureBtn.setText(savedInstanceState.getString("measureBtnText"));
+            measureBtn.setText(savedState.getString("measureBtnText"));
+            progMsg.setText(savedState.getString("progMsgText"));
         }
-        savedState = null;*/
-
+        savedState = null;
         return rootView;
     }
 
     public void setScanBtn(String text) {
         measureBtn.setText(text);
+    }
+
+    public void setProgMsg(String text){
+        progMsg.setText(text);
     }
 
     public void countdown(View v) {
@@ -249,14 +261,15 @@ public class ConfigFragment extends Fragment {
     private Bundle saveState() { /* called either from onDestroyView() or onSaveInstanceState() */
         Bundle state = new Bundle();
         state.putString("measureBtnText", measureBtn.getText().toString());
+        state.putString("progMsgText", progMsg.getText().toString());
         return state;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        /*savedState = saveState(); *//* vstup defined here for sure *//*
-        measureBtn = null;*/
+        savedState = saveState(); /* vstup defined here for sure */
+        measureBtn = null;
         /*if (cTimer != null) //avoid memory leak
             cTimer.cancel();*/
     }
@@ -268,7 +281,7 @@ public class ConfigFragment extends Fragment {
         /* If onDestroyView() is called first, we can use the previously savedState but we can't call saveState() anymore */
         /* If onSaveInstanceState() is called first, we don't have savedState, so we need to call saveState() */
         /* => (?:) operator inevitable! */
-        //outState.putBundle("configFragSavedState", (savedState != null) ? savedState : saveState());
+        outState.putBundle("configFragSavedState", (savedState != null) ? savedState : saveState());
     }
 
 }

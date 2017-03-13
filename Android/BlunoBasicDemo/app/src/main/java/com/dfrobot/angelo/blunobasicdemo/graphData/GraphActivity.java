@@ -48,13 +48,14 @@ public class GraphActivity extends BlunoLibrary {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /*if (savedInstanceState != null) {
+         //restore state of config fragment if it exists
+        if (savedInstanceState != null) {
             //Restore the fragment's instance
             configFrag = (ConfigFragment)getSupportFragmentManager().getFragment(savedInstanceState, "savedConfigFragment");
         }
         else{
             configFrag = new ConfigFragment();
-        }*/
+        }
 
         onCreateProcess();						//onCreate Process by BlunoLibrary
         serialBegin(115200);					//set the Uart Baudrate on BLE chip to 115200
@@ -65,7 +66,7 @@ public class GraphActivity extends BlunoLibrary {
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         viewPager = (ViewPager) findViewById(R.id.g_viewPager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        configFrag = new ConfigFragment();
+        //configFrag = new ConfigFragment();
         hydrateFrag = new HydrationFragment();
         respirationFrag = new RespirationFragment();
 
@@ -115,9 +116,8 @@ public class GraphActivity extends BlunoLibrary {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        //Save the fragment's instance
-        //getSupportFragmentManager().putFragment(outState, "savedConfigFragment", configFrag);
+         //Save the config fragment's instance
+        getSupportFragmentManager().putFragment(outState, "savedConfigFragment", configFrag);
     }
 
 
@@ -129,6 +129,7 @@ public class GraphActivity extends BlunoLibrary {
             case isConnected:
                 //scanBtn.setText("Connected");
                 connectionState = "Measure";
+                configFrag.setProgMsg("Tap Measure to Proceed");
                 break;
             case isConnecting:
                 //scanBtn.setText("Connecting");
@@ -151,8 +152,10 @@ public class GraphActivity extends BlunoLibrary {
         }
         if (connectionState != null){
             configFrag = (ConfigFragment) viewPagerAdapter.getFragment(0);
-            if (configFrag !=null)
+            if (configFrag !=null){
                 configFrag.setScanBtn(connectionState);
+            }
+
         }
     }
     public void scanDevices(View v){
