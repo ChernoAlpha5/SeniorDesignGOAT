@@ -10,15 +10,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import com.dfrobot.angelo.blunobasicdemo.BlunoLibrary;
 import com.dfrobot.angelo.blunobasicdemo.Filter.filterData;
-import com.dfrobot.angelo.blunobasicdemo.MainActivity;
 import com.dfrobot.angelo.blunobasicdemo.R;
 import com.github.mikephil.charting.data.Entry;
 import android.view.View;
-import android.widget.Button;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -51,18 +48,27 @@ public class GraphActivity extends BlunoLibrary {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        /*if (savedInstanceState != null) {
+            //Restore the fragment's instance
+            configFrag = (ConfigFragment)getSupportFragmentManager().getFragment(savedInstanceState, "savedConfigFragment");
+        }
+        else{
+            configFrag = new ConfigFragment();
+        }*/
+
         onCreateProcess();						//onCreate Process by BlunoLibrary
         serialBegin(115200);					//set the Uart Baudrate on BLE chip to 115200
 
-        setContentView(R.layout.g_activity_graph);
+        setContentView(R.layout.activity_graph);
         toolbar = (Toolbar) findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         viewPager = (ViewPager) findViewById(R.id.g_viewPager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        configFrag = new ConfigFragment();
         hydrateFrag = new HydrationFragment();
         respirationFrag = new RespirationFragment();
-        configFrag = new ConfigFragment();
+
         //scanBtn = (Button) findViewById(R.id.scanBtn);
         viewPagerAdapter.addFragments(configFrag, "Configure");
         viewPagerAdapter.addFragments(hydrateFrag, "Hydration");
@@ -105,6 +111,15 @@ public class GraphActivity extends BlunoLibrary {
         super.onDestroy();
         onDestroyProcess();														//onDestroy Process by BlunoLibrary
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        //Save the fragment's instance
+        //getSupportFragmentManager().putFragment(outState, "savedConfigFragment", configFrag);
+    }
+
 
     @Override
     public void onConectionStateChange(connectionStateEnum theConnectionState) {//Once connection state changes, this function will be called
@@ -182,7 +197,7 @@ public class GraphActivity extends BlunoLibrary {
     public connectionStateEnum getConnectionState(){
         return mConnectionState;
     }
-    //TODO: call filtereing method in this function
+    //TODO: call filtering method in this function
     //this function tests if there is any data lost, where data goes from 0 to val, and then val to 0
     public void processData(int seconds){
         filterData fData = new filterData();
@@ -264,13 +279,13 @@ public class GraphActivity extends BlunoLibrary {
         samples.clear();
     }
     //convert byte array to string
-    private String bytesToText(byte[] bytes, boolean simplifyNewLine) {
+/*    private String bytesToText(byte[] bytes, boolean simplifyNewLine) {
         String text = new String(bytes, Charset.forName("UTF-8"));
         if (simplifyNewLine) {
             text = text.replaceAll("(\\r\\n|\\r)", "\n");
         }
         return text;
-    }
+    }*/
 
     @TargetApi(Build.VERSION_CODES.M)
     private void requestLocationPermissionIfNeeded() {

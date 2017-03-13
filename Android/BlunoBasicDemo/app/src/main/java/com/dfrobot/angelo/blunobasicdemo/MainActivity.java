@@ -64,7 +64,7 @@ public class MainActivity  extends BlunoLibrary {
 		buttonLaunch.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				//setContentView(R.layout.g_activity_graph);
+				//setContentView(R.layout.activity_graph);
 				intent = new Intent(MainActivity.this,GraphActivity.class);
 				startActivity(intent);
 

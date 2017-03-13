@@ -6,6 +6,7 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -20,6 +21,8 @@ import com.dfrobot.angelo.blunobasicdemo.BlunoLibrary;
 import com.dfrobot.angelo.blunobasicdemo.R;
 import com.todddavies.components.progressbar.ProgressWheel;
 
+import org.w3c.dom.Text;
+
 import static android.content.Context.POWER_SERVICE;
 
 /**
@@ -29,13 +32,16 @@ import static android.content.Context.POWER_SERVICE;
 public class ConfigFragment extends Fragment {
     //Button scanBtn;
     Button measureBtn, vitalGoBtn;
-    View rootView /*, popupView*/;
+    View rootView;
     Spinner vitalSpinner, timeSpinner;
     //TextView timer;
+    TextView progMsg, loadingText;
     CountDownTimer cTimer = null;
     //ProgressBar progressBar;
-    Snackbar mySnackbar;
+    //Snackbar mySnackbar;
     ProgressWheel progWheel;
+    private Bundle savedState = null;
+    //String[] loadDots = {".", "..", "..."};     //used to "animate the progMsg string
     //WakeLock wakeLock;
     int runCounter = 0; //if run counter = 0 (when entering section) run counter, else wait
     private Handler mHandler = new Handler();
@@ -47,12 +53,12 @@ public class ConfigFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         rootView = inflater.inflate(R.layout.g_fragment_config, container, false);
-        //popupView = inflater.inflate(R.layout.vital_popup, container, false);
-        //scanBtn = (Button) rootView.findViewById(R.id.scanBtn);
-        //timer = (TextView) rootView.findViewById(R.id.timer);
-        measureBtn = (Button) rootView.findViewById(R.id.measureBtn);
-        //progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
+
+        progMsg = (TextView)rootView.findViewById(R.id.progMsg);
+        loadingText = (TextView)rootView.findViewById(R.id.loadingText);
+        measureBtn = (Button)rootView.findViewById(R.id.measureBtn);
 
         measureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,11 +66,14 @@ public class ConfigFragment extends Fragment {
                 if (!(((GraphActivity) getActivity()).getConnectionState() == BlunoLibrary.connectionStateEnum.isConnected)) {
                     ((GraphActivity) getActivity()).scanDevices(v);
                 }
+                //cancel measurements if button pressed for a 2nd time
                 else if (runCounter > 0){
-                    //else {   //cancel measurements
+                    //else {
                         if (cTimer != null) {
                     /*if (wakeLock != null)
                         wakeLock.release();*/
+                            progMsg.setText("Cancelled");
+                            loadingText.setText("");
                             ((GraphActivity) getActivity()).sendToBluno("c");   //tell Bluno to cancel measurements
                             ((GraphActivity) getActivity()).clearData();
                             measureBtn.setText("measure");
@@ -107,8 +116,7 @@ public class ConfigFragment extends Fragment {
                         }
 
                     });
-                    //setContentView(R.layout.g_activity_graph);
-
+                    //setContentView(R.layout.activity_graph);
 
                 }
 
@@ -118,6 +126,17 @@ public class ConfigFragment extends Fragment {
 
        // mySnackbar = Snackbar.make(rootView, R.string.connect_first, Snackbar.LENGTH_SHORT);
         progWheel = (ProgressWheel) rootView.findViewById(R.id.pw_spinner);
+
+         /* If the Fragment was destroyed inbetween (screen rotation), we need to recover the savedState first */
+         /* However, if it was not, it stays in the instance from the last onDestroyView() and we don't want to overwrite it */
+        /*if(savedInstanceState != null && savedState == null) {
+            savedState = savedInstanceState.getBundle("configFragSavedState");
+        }
+        if(savedState != null) {
+            measureBtn.setText(savedInstanceState.getString("measureBtnText"));
+        }
+        savedState = null;*/
+
         return rootView;
     }
 
@@ -140,6 +159,7 @@ public class ConfigFragment extends Fragment {
                 final long cTime;
                 runCounter++;
                 measureBtn.setText("cancel");
+                String progMsgStr;
                 final int cntInterval = 500;
                 // convert spinner value (string) to milliseconds
                 String[] minSec = timeSpinner.getSelectedItem().toString().split(":"); //format: "mm:ss" - separate minutes and seconds
@@ -147,17 +167,31 @@ public class ConfigFragment extends Fragment {
 
                 if (vitalSpinner.getSelectedItem().toString().equals("Respiration")) {
                     ((GraphActivity) getActivity()).sendToBluno("r" + cTime / 1000);   //tell Bluno how long we are sampling for in seconds
+                    progMsgStr = "Measuring Respiration";
                 } else {
                     ((GraphActivity) getActivity()).sendToBluno("h" + cTime / 1000);   //tell Bluno how long we are sampling for in seconds
+                    progMsgStr = "Measuring Hydration";
                 }
+                progMsg.setText(progMsgStr);
                 cTimer = new CountDownTimer(cTime, cntInterval) { //1st arg: time length in ms, 2nd arg: interval to call onTick()
                     float currProg = 0;
-                    float prevProg = 0;
+                    int dotInd = 0;
+                    String loadStr = "";
+                    //String progMsgStr = progMsgStr;
+                    //float prevProg = 0;
 
                     public void onTick(long millisUntilFinished) {
                         long mins = millisUntilFinished / 60000;
                         long secs = (millisUntilFinished % 60000) / 1000;
-                        int divider = 1000 / cntInterval;
+
+                         //"animate" program message so it indicates that measurement is in progress with: ".", "..", "...", etc.
+                        loadingText.setText(loadStr);
+                        loadStr += '.';
+                        dotInd++;
+                        if (dotInd == 4) {
+                            loadStr = "";
+                            dotInd = 0;
+                        }
                         String strSecs = secs + "";
                         if (secs < 10)
                             strSecs = "0" + secs;
@@ -174,7 +208,8 @@ public class ConfigFragment extends Fragment {
                         //progressBar.setProgress(progressBar.getMax());
                         progWheel.setProgress(360);
                         progWheel.setText("0:00");
-                        //timer.setText("Done!");
+                        progMsg.setText("Done!");
+                        loadingText.setText("");
                         runCounter = 0;
                         ((GraphActivity) getActivity()).processData((int) (cTime / 1000));
                         /*if (wakeLock != null)
@@ -193,8 +228,10 @@ public class ConfigFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+     /*   if (savedInstanceState !=null && measureBtn != null)
+            measureBtn.setText(savedInstanceState.getString("measureBtnText"));*/
          //TODO: CREATE COORDINATOR LAYOUT FOR POPUP???
-        mySnackbar = Snackbar.make(rootView, R.string.connect_first, Snackbar.LENGTH_LONG);
+        //mySnackbar = Snackbar.make(rootView, R.string.connect_first, Snackbar.LENGTH_LONG);
     }
 
     @Override
@@ -209,10 +246,29 @@ public class ConfigFragment extends Fragment {
         }*/
     }
 
+    private Bundle saveState() { /* called either from onDestroyView() or onSaveInstanceState() */
+        Bundle state = new Bundle();
+        state.putString("measureBtnText", measureBtn.getText().toString());
+        return state;
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        /*savedState = saveState(); *//* vstup defined here for sure *//*
+        measureBtn = null;*/
         /*if (cTimer != null) //avoid memory leak
             cTimer.cancel();*/
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //outState.putString("measureBtnText", measureBtn.getText().toString());
+        /* If onDestroyView() is called first, we can use the previously savedState but we can't call saveState() anymore */
+        /* If onSaveInstanceState() is called first, we don't have savedState, so we need to call saveState() */
+        /* => (?:) operator inevitable! */
+        //outState.putBundle("configFragSavedState", (savedState != null) ? savedState : saveState());
+    }
+
 }

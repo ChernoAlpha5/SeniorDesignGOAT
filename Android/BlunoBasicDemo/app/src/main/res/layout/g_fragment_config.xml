@@ -80,8 +80,8 @@
 
        <com.todddavies.components.progressbar.ProgressWheel
            android:id="@+id/pw_spinner"
-           android:layout_width="200dp"
-           android:layout_height="200dp"
+           android:layout_width="225dp"
+           android:layout_height="225dp"
            android:layout_centerInParent="true"
            ProgressWheel:pwBarColor="@color/colorAccent"
            ProgressWheel:pwBarLength="60dp"
@@ -90,17 +90,37 @@
            ProgressWheel:pwRimWidth="2dp"
            ProgressWheel:pwText="0:00"
            ProgressWheel:pwTextColor="#222"
-           ProgressWheel:pwTextSize="50sp" />
+           ProgressWheel:pwTextSize="60sp" />
 
        <Button
            android:id="@+id/measureBtn"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:text="Scan"
+           android:textSize="18sp"
            android:layout_marginTop="20dp"
            android:layout_below="@id/pw_spinner"
            android:layout_centerInParent="true"
            android:onClick="countdown"/>
+
+       <TextView
+           android:id="@+id/progMsg"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginBottom="60dp"
+           android:textSize="16sp"
+           android:text="Press Scan to Start"
+           android:layout_above="@+id/measureBtn"
+           android:layout_centerHorizontal="true" />
+
+       <TextView
+           android:id="@+id/loadingText"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:textSize="35sp"
+           android:layout_above="@+id/measureBtn"
+           android:layout_centerHorizontal="true"
+           android:layout_marginBottom="30dp" />
 
 
    </RelativeLayout>
