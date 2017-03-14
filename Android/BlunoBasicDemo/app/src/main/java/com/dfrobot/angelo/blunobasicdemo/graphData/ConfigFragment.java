@@ -176,7 +176,7 @@ public class ConfigFragment extends Fragment {
                     progMsgStr = "Measuring Respiration";
                 } else {
                     ((GraphActivity) getActivity()).sendToBluno("h" + cTime / 1000);   //tell Bluno how long we are sampling for in seconds
-                    mType = measType.RESPIRATION;
+                    mType = measType.HYDRATION;
                     progMsgStr = "Measuring Hydration";
                 }
                 progMsg.setText(progMsgStr);

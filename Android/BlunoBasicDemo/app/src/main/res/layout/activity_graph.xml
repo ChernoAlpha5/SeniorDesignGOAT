@@ -39,18 +39,21 @@
         android:id="@+id/hydration_fragment"
         android:layout_weight="1"
         android:layout_width="0dp"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:layout="@layout/g_fragment_hydration" />
 
     <fragment android:name="com.dfrobot.angelo.blunobasicdemo.graphData.ConfigFragment"
         android:id="@+id/config_fragment"
         android:layout_weight="1"
         android:layout_width= "0dp"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:layout="@layout/g_fragment_config" />
 
     <fragment android:name="com.dfrobot.angelo.blunobasicdemo.graphData.RespirationFragment"
         android:id="@+id/respiration_fragment"
         android:layout_weight="1"
         android:layout_width= "0dp"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:layout="@layout/g_fragment_respiration" />
 
 </RelativeLayout>

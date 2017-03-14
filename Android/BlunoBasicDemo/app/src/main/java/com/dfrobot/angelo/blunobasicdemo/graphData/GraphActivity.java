@@ -80,11 +80,12 @@ public class GraphActivity extends BlunoLibrary {
 
 
         //scanBtn = (Button) findViewById(R.id.scanBtn);
-        viewPagerAdapter.addFragments(configFrag, "Configure");
         viewPagerAdapter.addFragments(respirationFrag, "Respiration");
+        viewPagerAdapter.addFragments(configFrag, "Configure");
         viewPagerAdapter.addFragments(hydrateFrag, "Hydration");
 
         viewPager.setAdapter(viewPagerAdapter);
+        viewPager.setCurrentItem(1);
         tabLayout.setupWithViewPager(viewPager);
         requestLocationPermissionIfNeeded();
     }
@@ -156,7 +157,7 @@ public class GraphActivity extends BlunoLibrary {
                 break;
         }
         if (connectionState != null){
-            configFrag = (ConfigFragment) viewPagerAdapter.getFragment(0);
+            configFrag = (ConfigFragment) viewPagerAdapter.getFragment(1);
             if (configFrag !=null){
                 configFrag.setScanBtn(connectionState);
             }
@@ -205,7 +206,7 @@ public class GraphActivity extends BlunoLibrary {
 
     public void processData(measType measType, int seconds){
 
-        if (measType == GraphActivity.measType.RESPIRATION){
+        if (measType == measType.RESPIRATION){
             filterData fData = new filterData();
             //format data to remove \\r\\n characters and discard any data less than <threshold>
             for (int i = 1; i < samples.size(); i++){  //ensure no newline characters in string
@@ -250,21 +251,23 @@ public class GraphActivity extends BlunoLibrary {
                 @Override
                 public void run() {
 
-                    /*respirationFrag = (RespirationFragment) viewPagerAdapter.getFragment(1);  //respiration fragment is at position 1 in hashmap
+                    respirationFrag = (RespirationFragment) viewPagerAdapter.getFragment(0);  //respiration fragment is at position 1 in hashmap
                     if (respirationFrag != null) {
                         respirationFrag.respDispMsg(Float.toString(breathsPerMin));
-                    }*/
-                    hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(2);  //hydration fragment is at position 2 in hashmap
+                    }
+                    /*hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(2);  //hydration fragment is at position 2 in hashmap
                     if (hydrateFrag != null) {
                         hydrateFrag.hydrateDispMsg2("42");
-                    }
+                    }*/
                 }
             });
+            if (viewPager != null)
+                viewPager.setCurrentItem(0);
 
             //setContentView(R.layout.g_fragment_respiration);
 
         }
-        else{ //TODO: IMPLEMENT RESPIRATION PROCESSING
+        if (measType == measType.HYDRATION){ //TODO: IMPLEMENT RESPIRATION PROCESSING
             //graph filtered result on hydration graph
             runOnUiThread(new Runnable() {
                 @Override
@@ -275,6 +278,8 @@ public class GraphActivity extends BlunoLibrary {
                     }
                 }
             });
+            if (viewPager != null)
+                viewPager.setCurrentItem(2);
 
 
         }

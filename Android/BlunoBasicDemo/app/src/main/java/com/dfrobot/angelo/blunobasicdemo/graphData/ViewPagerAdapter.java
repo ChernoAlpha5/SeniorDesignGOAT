@@ -21,7 +21,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     ArrayList<String> tabTitles = new ArrayList<String>();
     private Map<Integer,String> mFragmentTags = new HashMap<Integer,String>(); //define a hash map to store the Tags of the Fragments
     private FragmentManager mFragmentManage;
-    private Context mContext;
+    //private Context mContext;
 
 /*    public ViewPagerAdapter(FragmentManager fm, Context context){
         super(fm);
