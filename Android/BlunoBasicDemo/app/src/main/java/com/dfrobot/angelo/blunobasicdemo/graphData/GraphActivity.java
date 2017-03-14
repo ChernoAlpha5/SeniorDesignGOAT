@@ -3,6 +3,8 @@ package com.dfrobot.angelo.blunobasicdemo.graphData;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,16 +12,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import com.dfrobot.angelo.blunobasicdemo.BlunoLibrary;
-import com.dfrobot.angelo.blunobasicdemo.MainActivity;
+import com.dfrobot.angelo.blunobasicdemo.Filter.filterData;
 import com.dfrobot.angelo.blunobasicdemo.R;
 import com.github.mikephil.charting.data.Entry;
 import android.view.View;
-import android.widget.Button;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 public class GraphActivity extends BlunoLibrary {
@@ -31,7 +30,7 @@ public class GraphActivity extends BlunoLibrary {
     HydrationFragment hydrateFrag;
     RespirationFragment respirationFrag;
     ConfigFragment configFrag;
-    Button scanBtn;
+    //Button scanBtn;
 
     // hydration plot variables
     ArrayList<String> hXAXES = new ArrayList<String>();
@@ -40,31 +39,51 @@ public class GraphActivity extends BlunoLibrary {
 
     //data collection variables
     int numSamples = 0;
-    int maxSamples = 2000;
-    ArrayList<String> samples = new ArrayList<String>(2000);
-
+    int maxSamples = 4000;
+    int threshold = 1000; //minimum PPG data value. Anything lower than this is discarded
+    ArrayList<String> samples = new ArrayList<String>(maxSamples/2);
+    ArrayList<Float> rData = new ArrayList<Float>(maxSamples/2);
     private static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
+    public enum measType {HYDRATION, RESPIRATION}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+         //restore state of config fragment if it exists
+        if (savedInstanceState != null) {
+            //Restore the fragment's instance
+            configFrag = (ConfigFragment)getSupportFragmentManager().getFragment(savedInstanceState, "savedConfigFragment");
+        }
+        else{
+            configFrag = new ConfigFragment();
+        }
+
         onCreateProcess();						//onCreate Process by BlunoLibrary
         serialBegin(115200);					//set the Uart Baudrate on BLE chip to 115200
 
-        setContentView(R.layout.g_activity_graph);
+        setContentView(R.layout.activity_graph);
         toolbar = (Toolbar) findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         viewPager = (ViewPager) findViewById(R.id.g_viewPager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        //configFrag = new ConfigFragment();
         hydrateFrag = new HydrationFragment();
         respirationFrag = new RespirationFragment();
-        configFrag = new ConfigFragment();
-        scanBtn = (Button) findViewById(R.id.scanBtn);
+
+    /*    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.g_viewPager, configFrag);
+        fragmentTransaction.add(R.id.g_viewPager, hydrateFrag);
+        fragmentTransaction.add(R.id.g_viewPager, respirationFrag);
+        fragmentTransaction.commit();*/
+
+
+        //scanBtn = (Button) findViewById(R.id.scanBtn);
         viewPagerAdapter.addFragments(configFrag, "Configure");
-        viewPagerAdapter.addFragments(hydrateFrag, "Hydration");
         viewPagerAdapter.addFragments(respirationFrag, "Respiration");
+        viewPagerAdapter.addFragments(hydrateFrag, "Hydration");
+
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -105,25 +124,44 @@ public class GraphActivity extends BlunoLibrary {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+         //Save the config fragment's instance
+        if (configFrag != null)
+            getSupportFragmentManager().putFragment(outState, "savedConfigFragment", configFrag);
+    }
+
+
+    @Override
     public void onConectionStateChange(connectionStateEnum theConnectionState) {//Once connection state changes, this function will be called
+        String connectionState = null;
         switch (theConnectionState) {											//Four connection state
+
             case isConnected:
-                scanBtn.setText("Connected");   //TODO: FIX BUTTON CHANGES
+                connectionState = "Measure";
+                configFrag.setProgMsg("Tap Measure to Proceed");
                 break;
             case isConnecting:
-                scanBtn.setText("Connecting");
+                connectionState = "Connecting";
                 break;
             case isToScan:
-                scanBtn.setText("Scan");
+                connectionState = "Scan";
                 break;
             case isScanning:
-                scanBtn.setText("Scanning");
+                connectionState = "Scanning";
                 break;
             case isDisconnecting:
-                scanBtn.setText("isDisconnecting");
+                connectionState = "isDisconnecting";
                 break;
             default:
                 break;
+        }
+        if (connectionState != null){
+            configFrag = (ConfigFragment) viewPagerAdapter.getFragment(0);
+            if (configFrag !=null){
+                configFrag.setScanBtn(connectionState);
+            }
+
         }
     }
     public void scanDevices(View v){
@@ -133,12 +171,15 @@ public class GraphActivity extends BlunoLibrary {
     @Override
     public void onSerialReceived(final String theString) {//Once connection data received, this function will be called
 
-       /* if (numSamples <  maxSamples ){
+        if (samples.size() <  maxSamples ){
             samples.add(theString);
         }
-        else{
-            //processData(samples); */
-            runOnUiThread(new Runnable() {
+/*        else {
+            int numErrors = processData(samples);
+            System.out.println("Samples correct? " + numErrors);
+        }*/
+
+            /*runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     //hydrateFrag = (HydrationFragment) getSupportFragmentManager().findFragmentById(R.id.hydration_fragment);
@@ -151,30 +192,106 @@ public class GraphActivity extends BlunoLibrary {
                         hydrateFrag.hydrateDispMsg2(bytesToText(byteArr, true));
                     }
                 }
-            });
+            });*/
 
         //}
 
     }
-    //TODO: call filtereing method in this function
-    private void processData(ArrayList<String> data){
-        numSamples = 0;
-        for (String s: data){
-            s.replaceAll("(\\r\\n|\\r)", "\n");
-            byte[] byteArr = s.getBytes();
-            bytesToText(byteArr, true);
-        }
-        samples.clear();
+    //send the data to the BLUNO
+    public void sendToBluno(String text){serialSend(text);}
+
+    public connectionStateEnum getConnectionState(){
+        return mConnectionState;
     }
 
+    public void processData(measType measType, int seconds){
+
+        if (measType == GraphActivity.measType.RESPIRATION){
+            filterData fData = new filterData();
+            //format data to remove \\r\\n characters and discard any data less than <threshold>
+            for (int i = 1; i < samples.size(); i++){  //ensure no newline characters in string
+                String s = samples.get(i);
+                char delineator = '\r';
+                //int index = s.indexOf(delineator);
+                //data error - sometimes there are 2+ datas per entry in data ArrayList
+                try{
+                    if (s.indexOf(delineator) > 0 && s.indexOf(delineator) < (s.length() - 3)){
+                        //data.remove(i);
+                        String[] sArr = s.split("\\r\\n");
+                        int currInd = i;
+                        for (int x = 0; x < sArr.length; x ++) {
+                            Float f = Float.parseFloat(sArr[x]);
+                            if (f >= threshold){
+                                rData.add(/*currInd,*/ f);
+                                currInd++;
+                            }
+                        }
+                        i = currInd -1; //update index after inserting data
+                    }
+                    else{
+                        Float f = Float.parseFloat(samples.get(i).replaceAll("\\r\\n", ""));
+                        if (f >= threshold){
+                            rData.add(f);
+                        }
+                    }
+                }
+                catch(NumberFormatException e){e.printStackTrace();}    //in case the number is not a valid float
+            }
+            int breaths = 0;
+            if (rData.size() > 0)
+                breaths = fData.calculateRespRate(rData);
+
+            rData.clear();
+            samples.clear();
+            final float breathsPerMin = breaths/((float)seconds/60);
+            System.out.println(breathsPerMin);     //calculate breaths per minute
+
+            //graph filtered result on respiration graph
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    //respirationFrag = (RespirationFragment) viewPagerAdapter.getFragment(2);  //respiration fragment is at position 2 in hashmap
+                    if (respirationFrag != null) {
+                        respirationFrag.respDispMsg(Float.toString(breathsPerMin));
+                    }
+/*                    if (hydrateFrag != null) {
+                        hydrateFrag.hydrateDispMsg2("0");
+                    }*/
+                }
+            });
+
+            //setContentView(R.layout.g_fragment_respiration);
+
+        }
+        else{ //TODO: IMPLEMENT RESPIRATION PROCESSING
+            //graph filtered result on hydration graph
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run(){
+                    //hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(1); //is this needed?
+                    if (hydrateFrag != null){
+                        hydrateFrag.hydrateDispMsg2("0");
+                    }
+                }
+            });
+
+
+        }
+    }
+
+    public void clearData(){
+        rData.clear();
+        samples.clear();
+    }
     //convert byte array to string
-    private String bytesToText(byte[] bytes, boolean simplifyNewLine) {
+/*    private String bytesToText(byte[] bytes, boolean simplifyNewLine) {
         String text = new String(bytes, Charset.forName("UTF-8"));
         if (simplifyNewLine) {
             text = text.replaceAll("(\\r\\n|\\r)", "\n");
         }
         return text;
-    }
+    }*/
 
     @TargetApi(Build.VERSION_CODES.M)
     private void requestLocationPermissionIfNeeded() {

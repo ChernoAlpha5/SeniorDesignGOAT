@@ -12,14 +12,13 @@
         android:layout_height="wrap_content"
         android:hint="Enter a value"
         android:layout_alignParentLeft="true"
-        android:layout_toLeftOf ="@+id/button1"
+        android:layout_toLeftOf ="@+id/hydrSend"
         android:layout_above="@+id/title"/>
     <Button
-        android:id="@id/button1"
+        android:id="@id/hydrSend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Send"
-        android:onClick="hydrateDispMsg"
         android:layout_alignParentRight="true"
         android:layout_above="@id/title"/>
     <TextView
@@ -39,10 +38,10 @@
         android:gravity="center"
         android:textSize = "25dp"
         android:textStyle = "bold"
-        android:layout_above="@+id/hydrateChart"/>
+        android:layout_above="@+id/hydrChart"/>
 
     <com.github.mikephil.charting.charts.LineChart
-        android:id = "@id/hydrateChart"
+        android:id = "@id/hydrChart"
         android:layout_width="match_parent"
         android:layout_height="350dp"
         android:layout_alignParentBottom="true"

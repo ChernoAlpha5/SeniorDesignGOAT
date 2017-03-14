@@ -1,12 +1,13 @@
 
    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:ProgressWheel="http://schemas.android.com/apk/res-auto"
         android:id="@+id/f_Config"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="com.dfrobot.angelo.blunobasicdemo.graphData.ConfigFragment">
 
-       <Button
+       <!--Button
            android:id="@+id/scanBtn"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
@@ -16,6 +17,111 @@
            android:onClick="scanDevices"
            android:layout_alignParentTop="true"
            android:layout_alignParentStart="true" />
+
+
+       <TextView
+           android:text="Select Vital"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="20dp"
+           android:id="@+id/vitalText"
+           android:layout_below="@+id/scanBtn"
+           android:layout_alignStart="@id/scanBtn"
+           tools:textSize="16sp" />
+
+       <Spinner
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_below="@+id/scanBtn"
+           android:layout_toRightOf="@id/vitalText"
+           android:layout_marginLeft="30dp"
+           android:layout_marginTop="20dp"
+           android:id="@+id/vitalSpinner" />
+
+       <TextView
+           android:text="Set Time"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_below="@+id/vitalText"
+           android:layout_alignStart="@+id/scanBtn"
+           android:layout_marginTop="20dp"
+           android:id="@+id/timeText"
+           tools:textSize="16sp" />
+       <Spinner
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_toRightOf="@id/timeText"
+           android:layout_alignStart="@id/vitalSpinner"
+           android:layout_alignEnd="@id/vitalSpinner"
+           android:layout_below="@+id/vitalText"
+           android:layout_marginTop="20dp"
+           android:id="@+id/timeSpinner" />
+
+
+       <ProgressBar
+           style="?android:attr/progressBarStyleHorizontal"
+           android:layout_width="150dp"
+           android:layout_height="30dp"
+           android:id="@+id/progressBar"
+           android:layout_marginTop="20dp"
+           android:layout_below="@id/timeSpinner"
+           android:layout_alignStart="@id/vitalSpinner" />
+
+       <TextView
+           android:text="Timer"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="10dp"
+           android:layout_marginTop="10dp"
+           android:layout_toRightOf="@id/progressBar"
+           android:layout_alignTop="@id/measureBtn"
+           android:id="@+id/timer"
+           tools:textSize="16sp" /-->
+
+       <com.todddavies.components.progressbar.ProgressWheel
+           android:id="@+id/pw_spinner"
+           android:layout_width="225dp"
+           android:layout_height="225dp"
+           android:layout_centerInParent="true"
+           ProgressWheel:pwBarColor="@color/colorAccent"
+           ProgressWheel:pwBarLength="60dp"
+           ProgressWheel:pwBarWidth="5dp"
+           ProgressWheel:pwRimColor="#330097D6"
+           ProgressWheel:pwRimWidth="2dp"
+           ProgressWheel:pwText="0:00"
+           ProgressWheel:pwTextColor="#222"
+           ProgressWheel:pwTextSize="60sp" />
+
+       <Button
+           android:id="@+id/measureBtn"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Scan"
+           android:textSize="18sp"
+           android:layout_marginTop="20dp"
+           android:layout_below="@id/pw_spinner"
+           android:layout_centerInParent="true"
+           android:onClick="countdown"/>
+
+       <TextView
+           android:id="@+id/progMsg"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginBottom="60dp"
+           android:textSize="16sp"
+           android:text="Press Scan to Start"
+           android:layout_above="@+id/measureBtn"
+           android:layout_centerHorizontal="true" />
+
+       <TextView
+           android:id="@+id/loadingText"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:textSize="35sp"
+           android:layout_above="@+id/measureBtn"
+           android:layout_centerHorizontal="true"
+           android:layout_marginBottom="30dp" />
+
 
    </RelativeLayout>
 

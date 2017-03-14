@@ -30,7 +30,7 @@ import java.util.Calendar;
 public class HydrationFragment extends Fragment {
     int xAxisWindow = 30;          //(time in seconds) constrict x axis window to
     long referenceTimestamp = -1;   // initial time stamp represents time in seconds since 1970. Initially -1 to indicate it has not been set yet
-    LineChart hydrateChart;
+    LineChart hydrChart;
     TextView hydrationLvl;
     View rootView;
     EditText editText;
@@ -49,8 +49,8 @@ public class HydrationFragment extends Fragment {
         // Inflate the layout for this fragment
         rootView =  inflater.inflate(R.layout.g_fragment_hydration, container, false);
 
-        final View button1 = rootView.findViewById(R.id.button1);
-        button1.setOnClickListener(
+        final View hydrSendBtn = rootView.findViewById(R.id.hydrSend);
+        hydrSendBtn.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -60,17 +60,17 @@ public class HydrationFragment extends Fragment {
                 }
         );
 
-        hydrateChart = (LineChart)rootView.findViewById(R.id.hydrateChart);
-        hydrateChart.setTouchEnabled(true); // enable touch gestures
+        hydrChart = (LineChart)rootView.findViewById(R.id.hydrChart);
+        hydrChart.setTouchEnabled(true); // enable touch gestures
 
          // set y axis options
-        YAxis leftAxis = hydrateChart.getAxisLeft();
+        YAxis leftAxis = hydrChart.getAxisLeft();
         leftAxis.setTextColor(Color.BLACK);
         leftAxis.setDrawGridLines(true);
         leftAxis.setTextSize(12f);
         leftAxis.setDrawLabels(true);
 
-        YAxis rightAxis = hydrateChart.getAxisRight();
+        YAxis rightAxis = hydrChart.getAxisRight();
         rightAxis.setEnabled(false);
 
         //set axis min and max to 0, 100
@@ -78,7 +78,7 @@ public class HydrationFragment extends Fragment {
         leftAxis.setAxisMinimum(0f);
 
         //set x axis options
-        XAxis xaxis = hydrateChart.getXAxis();
+        XAxis xaxis = hydrChart.getXAxis();
         xaxis.setAxisMinimum(0f);
         xaxis.setAxisMaximum(86400);  //set x axis maximum to number of seconds in a day
         xaxis.setPosition(XAxisPosition.BOTTOM);
@@ -87,12 +87,12 @@ public class HydrationFragment extends Fragment {
         referenceTimestamp = System.currentTimeMillis()/1000;
         xAxisFormatter = new HourAxisValueFormatter(referenceTimestamp);
         xaxis.setValueFormatter(xAxisFormatter);
-        hydrateChart.setVisibleXRange(0, xAxisWindow);  //x axis is in seconds
+        hydrChart.setVisibleXRange(0, xAxisWindow);  //x axis is in seconds
 
 
-        /*hydrateChart.getXAxis().setAxisMinimum(0);
-        hydrateChart.getAxisLeft().setAxisMinimum(0);
-        hydrateChart.getAxisLeft().setAxisMinimum(100);*/
+        /*hydrChart.getXAxis().setAxisMinimum(0);
+        hydrChart.getAxisLeft().setAxisMinimum(0);
+        hydrChart.getAxisLeft().setAxisMinimum(100);*/
         hydrationLvl = (TextView)rootView.findViewById(R.id.hydrationLvl);
         editText = (EditText)rootView.findViewById(R.id.edit_message);
         initHPlot();
@@ -106,8 +106,8 @@ public class HydrationFragment extends Fragment {
         dataSet = new LineDataSet(entries, "Hydration Level"); // add entries to dataset
         dataSet.setColor(Color.RED);
         LineData lineData = new LineData(dataSet);
-        hydrateChart.setData(lineData);
-        hydrateChart.invalidate(); // refresh
+        hydrChart.setData(lineData);
+        hydrChart.invalidate(); // refresh
 
         //test graph by adding points
         /*addHPoint(0.2f,0.6f);
@@ -119,26 +119,26 @@ public class HydrationFragment extends Fragment {
 
     // add one point to hydration plot
     private void addHPoint(float XVal, float YVal){
-        LineData data = hydrateChart.getData();
-        //XAxis xaxis = hydrateChart.getXAxis();
+        LineData data = hydrChart.getData();
+        //XAxis xaxis = hydrChart.getXAxis();
         //data.addEntry(new Entry(XVal, YVal));
         data.notifyDataChanged();
         dataSet.addEntry(new Entry (XVal, YVal));
-        hydrateChart.notifyDataSetChanged(); // let the chart know it's data has changed
-        //hydrateChart.setVisibleXRangeMinimum(4f);
-        //hydrateChart.setVisibleXRangeMaximum(8);
+        hydrChart.notifyDataSetChanged(); // let the chart know it's data has changed
+        //hydrChart.setVisibleXRangeMinimum(4f);
+        //hydrChart.setVisibleXRangeMaximum(8);
         //
-        //hydrateChart.zoom(1,1, XVal, YVal);
-        hydrateChart.moveViewToX(XVal - xAxisWindow/2);
+        //hydrChart.zoom(1,1, XVal, YVal);
+        hydrChart.moveViewToX(XVal - xAxisWindow/2);
         /*if (XVal > xAxisInitMax){
 
             //set x axis options
-            //hydrateChart.setVisibleXRange(XVal-3, XVal+3);
-            hydrateChart.moveViewToX(data.getEntryCount()-5);
+            //hydrChart.setVisibleXRange(XVal-3, XVal+3);
+            hydrChart.moveViewToX(data.getEntryCount()-5);
             //xaxis.setAxisMinimum(XVal + 3f);
             //xaxis.setAxisMaximum(XVal - 3f);
         }*/
-        //hydrateChart.invalidate(); // refresh
+        //hydrChart.invalidate(); // refresh
         //entries.add(new Entry (XVal, YVal));
     }
 
@@ -153,7 +153,7 @@ public class HydrationFragment extends Fragment {
         /*if (referenceTimestamp < 0){
             referenceTimestamp = System.currentTimeMillis()/1000;
             xAxisFormatter = new HourAxisValueFormatter(referenceTimestamp);
-            XAxis xAxis = hydrateChart.getXAxis();
+            XAxis xAxis = hydrChart.getXAxis();
             xAxis.setValueFormatter(xAxisFormatter);
 
         }*/
@@ -185,7 +185,7 @@ public class HydrationFragment extends Fragment {
         /*if (referenceTimestamp < 0){
             referenceTimestamp = System.currentTimeMillis()/1000;
             xAxisFormatter = new HourAxisValueFormatter(referenceTimestamp);
-            XAxis xAxis = hydrateChart.getXAxis();
+            XAxis xAxis = hydrChart.getXAxis();
             xAxis.setValueFormatter(xAxisFormatter);
 
         }*/
@@ -195,7 +195,7 @@ public class HydrationFragment extends Fragment {
         String currMsg = hydrationLvl.getText().toString();
         try{
 
-            Integer intHydrateLvl = Integer.parseInt(data);
+            Float intHydrateLvl = Float.parseFloat(data);
             DateFormat df = new SimpleDateFormat("EEE, d MMM, HH:mm");
             String mydate = df.format(Calendar.getInstance().getTime());
             hydrationLvl.setText(intHydrateLvl  + "% as of " + mydate);
@@ -211,14 +211,11 @@ public class HydrationFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
-
     }
 
     @Override
     public void onPause() {
         super.onPause();
     }
-
 
 }

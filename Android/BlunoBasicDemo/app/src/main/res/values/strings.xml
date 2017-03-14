@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">BlunoBasicDemo</string>
+    <string name="app_name">Measure Vitals</string>
     <string name="ble_not_supported">BLE is not supported</string>
     <string name="label_data">Data:</string>
     <string name="label_device_address">Device address:</string>
@@ -20,4 +20,19 @@
     <string name="menu_scan">Scan</string>
     <string name="menu_stop">Stop</string>
     <string name="action_settings">Action settings</string>
+
+    <string-array name="vitals_arr">
+        <item>Respiration</item>
+        <item>Hydration</item>
+    </string-array>
+
+    <string name = "connect_first">"Error: please connect to Bluno before measuring</string>
+    <string-array name="time_arr">
+        <item>0:08</item>
+        <item>2:00</item>
+        <item>2:15</item>
+        <item>2:30</item>
+        <item>2:45</item>
+        <item>3:00</item>
+    </string-array>
 </resources>

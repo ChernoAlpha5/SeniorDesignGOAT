@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.dfrobot.angelo.blunobasicdemo.graphData.ConfigFragment"
+    android:id="@+id/vitalPopup"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:text="Select Vital"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="15dp"
+        android:id="@+id/vitalText"
+        tools:textSize="16sp" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/vitalText"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="15dp"
+        android:id="@+id/vitalSpinner" />
+
+    <TextView
+        android:text="Set Time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/vitalText"
+        android:layout_alignStart="@id/vitalText"
+        android:layout_marginTop="15dp"
+        android:id="@+id/timeText"
+        tools:textSize="16sp" />
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/timeText"
+        android:layout_alignStart="@id/vitalSpinner"
+        android:layout_alignEnd="@id/vitalSpinner"
+        android:layout_below="@+id/vitalText"
+        android:layout_marginTop="15dp"
+        android:id="@+id/timeSpinner" />
+
+
+    <TableRow
+        android:layout_alignStart="@id/timeText"
+        android:layout_alignEnd="@id/timeSpinner"
+        android:layout_below="@id/timeText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="10dp">
+
+        <Button
+            android:id="@+id/vitalGoBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="OK"
+            android:textColor="@color/colorAccent" />
+
+        <Button
+            android:id="@+id/vitalCancelBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="cancel"/>
+
+    </TableRow>
+
+
+</RelativeLayout>

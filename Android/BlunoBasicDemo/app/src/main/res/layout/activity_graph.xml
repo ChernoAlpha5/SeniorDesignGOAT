@@ -6,6 +6,7 @@
     android:id="@+id/g_activity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:keepScreenOn="true"
     tools:context="com.dfrobot.angelo.blunobasicdemo.graphData.GraphActivity">
 
     <android.support.design.widget.AppBarLayout
