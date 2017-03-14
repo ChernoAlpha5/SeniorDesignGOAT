@@ -238,6 +238,16 @@ public class GraphActivity extends BlunoLibrary {
                         //hydrateFrag.hydrateDispMsg2(bytesToText(byteArr, true));
                         hydrateFrag.hydrateDispMsg2(Float.toString(breathsPerMin));
                     }
+
+                    respirationFrag = (RespirationFragment) viewPagerAdapter.getFragment(2);
+                    if (respirationFrag != null) {
+                        //String byteStr = "";
+                        //String byteStr = new String(theString, "ASCII"); // for ASCII encoding
+                        //String s = theString.replaceAll("(\\r\\n|\\r)", "\n");
+                        //byte[] byteArr = s.getBytes();
+                        //hydrateFrag.hydrateDispMsg2(bytesToText(byteArr, true));
+                        respirationFrag.respDispMsg("35");
+                    }
                 }
             });
 
