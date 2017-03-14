@@ -4,26 +4,18 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import com.dfrobot.angelo.blunobasicdemo.BlunoLibrary;
+import com.dfrobot.angelo.blunobasicdemo.graphData.GraphActivity.measType;
 import com.dfrobot.angelo.blunobasicdemo.R;
 import com.todddavies.components.progressbar.ProgressWheel;
-
-import org.w3c.dom.Text;
-
-import static android.content.Context.POWER_SERVICE;
 
 /**
  * Created by Andrew on 2/19/2017.
@@ -172,16 +164,19 @@ public class ConfigFragment extends Fragment {
                 runCounter++;
                 measureBtn.setText("cancel");
                 String progMsgStr;
-                final int cntInterval = 500;
+                final int cntInterval = 300;
+                final measType mType;
                 // convert spinner value (string) to milliseconds
                 String[] minSec = timeSpinner.getSelectedItem().toString().split(":"); //format: "mm:ss" - separate minutes and seconds
                 cTime = Integer.parseInt(minSec[0]) * 60000 + Integer.parseInt(minSec[1]) * 1000;    //cTime is time to sample in milliseconds
 
                 if (vitalSpinner.getSelectedItem().toString().equals("Respiration")) {
                     ((GraphActivity) getActivity()).sendToBluno("r" + cTime / 1000);   //tell Bluno how long we are sampling for in seconds
+                    mType = measType.RESPIRATION;
                     progMsgStr = "Measuring Respiration";
                 } else {
                     ((GraphActivity) getActivity()).sendToBluno("h" + cTime / 1000);   //tell Bluno how long we are sampling for in seconds
+                    mType = measType.RESPIRATION;
                     progMsgStr = "Measuring Hydration";
                 }
                 progMsg.setText(progMsgStr);
@@ -196,7 +191,7 @@ public class ConfigFragment extends Fragment {
                         long mins = millisUntilFinished / 60000;
                         long secs = (millisUntilFinished % 60000) / 1000;
 
-                         //"animate" program message so it indicates that measurement is in progress with: ".", "..", "...", etc.
+                         //"animate" message so it indicates that measurement is in progress with: ".", "..", "...", etc.
                         loadingText.setText(loadStr);
                         loadStr += '.';
                         dotInd++;
@@ -223,7 +218,7 @@ public class ConfigFragment extends Fragment {
                         progMsg.setText("Done!");
                         loadingText.setText("");
                         runCounter = 0;
-                        ((GraphActivity) getActivity()).processData((int) (cTime / 1000));
+                        ((GraphActivity) getActivity()).processData(mType, (int) (cTime / 1000));
                         /*if (wakeLock != null)
                             wakeLock.release();*/
                     }

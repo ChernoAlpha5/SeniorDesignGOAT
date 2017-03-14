@@ -3,6 +3,8 @@ package com.dfrobot.angelo.blunobasicdemo.graphData;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,7 +19,6 @@ import com.dfrobot.angelo.blunobasicdemo.R;
 import com.github.mikephil.charting.data.Entry;
 import android.view.View;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 public class GraphActivity extends BlunoLibrary {
@@ -43,6 +44,7 @@ public class GraphActivity extends BlunoLibrary {
     ArrayList<String> samples = new ArrayList<String>(maxSamples/2);
     ArrayList<Float> rData = new ArrayList<Float>(maxSamples/2);
     private static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
+    public enum measType {HYDRATION, RESPIRATION}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +72,18 @@ public class GraphActivity extends BlunoLibrary {
         hydrateFrag = new HydrationFragment();
         respirationFrag = new RespirationFragment();
 
+    /*    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.g_viewPager, configFrag);
+        fragmentTransaction.add(R.id.g_viewPager, hydrateFrag);
+        fragmentTransaction.add(R.id.g_viewPager, respirationFrag);
+        fragmentTransaction.commit();*/
+
+
         //scanBtn = (Button) findViewById(R.id.scanBtn);
         viewPagerAdapter.addFragments(configFrag, "Configure");
-        viewPagerAdapter.addFragments(hydrateFrag, "Hydration");
         viewPagerAdapter.addFragments(respirationFrag, "Respiration");
+        viewPagerAdapter.addFragments(hydrateFrag, "Hydration");
+
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -117,7 +127,8 @@ public class GraphActivity extends BlunoLibrary {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
          //Save the config fragment's instance
-        getSupportFragmentManager().putFragment(outState, "savedConfigFragment", configFrag);
+        if (configFrag != null)
+            getSupportFragmentManager().putFragment(outState, "savedConfigFragment", configFrag);
     }
 
 
@@ -127,25 +138,20 @@ public class GraphActivity extends BlunoLibrary {
         switch (theConnectionState) {											//Four connection state
 
             case isConnected:
-                //scanBtn.setText("Connected");
                 connectionState = "Measure";
                 configFrag.setProgMsg("Tap Measure to Proceed");
                 break;
             case isConnecting:
-                //scanBtn.setText("Connecting");
                 connectionState = "Connecting";
                 break;
             case isToScan:
-                //scanBtn.setText("Scan");
                 connectionState = "Scan";
                 break;
             case isScanning:
-                //scanBtn.setText("Scanning");
                 connectionState = "Scanning";
                 break;
             case isDisconnecting:
                 connectionState = "isDisconnecting";
-                //scanBtn.setText("isDisconnecting");
                 break;
             default:
                 break;
@@ -191,90 +197,87 @@ public class GraphActivity extends BlunoLibrary {
         //}
 
     }
+    //send the data to the BLUNO
+    public void sendToBluno(String text){serialSend(text);}
 
-    public void sendToBluno(String text){
-         //TODO: check if BT has been connected
-        serialSend(text);				//send the data to the BLUNO
-
-    }
     public connectionStateEnum getConnectionState(){
         return mConnectionState;
     }
-    //TODO: call filtering method in this function
-    //this function tests if there is any data lost, where data goes from 0 to val, and then val to 0
-    public void processData(int seconds){
-        filterData fData = new filterData();
-         //format data to remove \\r\\n characters and discard any data less than <threshold>
-        for (int i = 1; i < samples.size(); i++){  //ensure no newline characters in string
-            String s = samples.get(i);
-            char delineator = '\r';
-            //int index = s.indexOf(delineator);
-             //data error - sometimes there are 2+ datas per entry in data ArrayList
-            try{
-                if (s.indexOf(delineator) > 0 && s.indexOf(delineator) < (s.length() - 3)){
-                    //data.remove(i);
-                    String[] sArr = s.split("\\r\\n");
-                    int currInd = i;
-                    for (int x = 0; x < sArr.length; x ++) {
-                        Float f = Float.parseFloat(sArr[x]);
+
+    public void processData(measType measType, int seconds){
+
+        if (measType == GraphActivity.measType.RESPIRATION){
+            filterData fData = new filterData();
+            //format data to remove \\r\\n characters and discard any data less than <threshold>
+            for (int i = 1; i < samples.size(); i++){  //ensure no newline characters in string
+                String s = samples.get(i);
+                char delineator = '\r';
+                //int index = s.indexOf(delineator);
+                //data error - sometimes there are 2+ datas per entry in data ArrayList
+                try{
+                    if (s.indexOf(delineator) > 0 && s.indexOf(delineator) < (s.length() - 3)){
+                        //data.remove(i);
+                        String[] sArr = s.split("\\r\\n");
+                        int currInd = i;
+                        for (int x = 0; x < sArr.length; x ++) {
+                            Float f = Float.parseFloat(sArr[x]);
+                            if (f >= threshold){
+                                rData.add(/*currInd,*/ f);
+                                currInd++;
+                            }
+                        }
+                        i = currInd -1; //update index after inserting data
+                    }
+                    else{
+                        Float f = Float.parseFloat(samples.get(i).replaceAll("\\r\\n", ""));
                         if (f >= threshold){
-                            rData.add(/*currInd,*/ f);
-                            currInd++;
+                            rData.add(f);
                         }
                     }
-                    i = currInd -1; //update index after inserting data
                 }
-                else{
-                    Float f = Float.parseFloat(samples.get(i).replaceAll("\\r\\n", ""));
-                    if (f >= threshold){
-                        rData.add(f);
-                    }
-                }
+                catch(NumberFormatException e){e.printStackTrace();}    //in case the number is not a valid float
             }
-            catch(NumberFormatException e){e.printStackTrace();}    //in case the number is not a valid float
-        }
-        int breaths = 0;
-        if (rData.size() > 0)
-            breaths = fData.calculateRespRate(rData);
+            int breaths = 0;
+            if (rData.size() > 0)
+                breaths = fData.calculateRespRate(rData);
 
-        rData.clear();
-        samples.clear();
-        final float breathsPerMin = breaths/((float)seconds/60);
-        System.out.println(breathsPerMin);     //calculate breaths per minute
+            rData.clear();
+            samples.clear();
+            final float breathsPerMin = breaths/((float)seconds/60);
+            System.out.println(breathsPerMin);     //calculate breaths per minute
 
-         //graph filtered result. TODO: PUT RESULT ON RESPIRATION GRAPH
-        runOnUiThread(new Runnable() {
+            //graph filtered result on respiration graph
+            runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    //hydrateFrag = (HydrationFragment) getSupportFragmentManager().findFragmentById(R.id.hydration_fragment);
-                    hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(1);  //is 0 the position in the hashmap??
-                    if (hydrateFrag != null) {
-                        //String byteStr = "";
-                        //String byteStr = new String(theString, "ASCII"); // for ASCII encoding
-                        //String s = theString.replaceAll("(\\r\\n|\\r)", "\n");
-                        //byte[] byteArr = s.getBytes();
-                        //hydrateFrag.hydrateDispMsg2(bytesToText(byteArr, true));
-                        hydrateFrag.hydrateDispMsg2(Float.toString(breathsPerMin));
+
+                    //respirationFrag = (RespirationFragment) viewPagerAdapter.getFragment(2);  //respiration fragment is at position 2 in hashmap
+                    if (respirationFrag != null) {
+                        respirationFrag.respDispMsg(Float.toString(breathsPerMin));
+                    }
+/*                    if (hydrateFrag != null) {
+                        hydrateFrag.hydrateDispMsg2("0");
+                    }*/
+                }
+            });
+
+            //setContentView(R.layout.g_fragment_respiration);
+
+        }
+        else{ //TODO: IMPLEMENT RESPIRATION PROCESSING
+            //graph filtered result on hydration graph
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run(){
+                    //hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(1); //is this needed?
+                    if (hydrateFrag != null){
+                        hydrateFrag.hydrateDispMsg2("0");
                     }
                 }
             });
 
-       /* int prev = Integer.parseInt(samples.get(1)); // start at 1 since data at 0 is garbage
-        int errors = 0;
-        for (int x = 2; x < samples.size(); x++){
-            try{
-                int curr = Integer.parseInt(samples.get(x));
-                if (Math.abs(prev - curr) != 1)
-                    errors++;
-                prev = curr;
-            }
-            catch(NumberFormatException e){ //catch numberFormatException
-                e.printStackTrace();
-                errors++;
-            }
+
         }
-        samples.clear();
-        return errors;*/
     }
 
     public void clearData(){

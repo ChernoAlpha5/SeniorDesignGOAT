@@ -49,7 +49,7 @@ public class RespirationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        rootView =  inflater.inflate(R.layout.g_fragment_respiration, container, false);;
+        rootView =  inflater.inflate(R.layout.g_fragment_respiration, container, false);
 
         final View respSendBtn = rootView.findViewById(R.id.respSend);
         respSendBtn.setOnClickListener(
@@ -90,7 +90,7 @@ public class RespirationFragment extends Fragment {
         respChart.setVisibleXRange(0, xAxisWindow);  //x axis is in seconds
 
         breathsPerMin = (TextView)rootView.findViewById(R.id.respRate);
-        editText = (EditText)rootView.findViewById(R.id.edit_message);
+        editText = (EditText)rootView.findViewById(R.id.Redit_message);
         initRPlot();
         return rootView;
     }
@@ -121,7 +121,7 @@ public class RespirationFragment extends Fragment {
     public void respDispMsg(String data){
         //subtract start time from every subsequent time measurement
         long currTime = System.currentTimeMillis()/1000 -  referenceTimestamp;
-        String currMsg = breathsPerMin.getText().toString();
+        //String currMsg = breathsPerMin.getText().toString();
         try{
 
             Float intRespRate = Float.parseFloat(data);
