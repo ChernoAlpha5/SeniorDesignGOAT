@@ -84,7 +84,6 @@ public class GraphActivity extends BlunoLibrary {
         viewPagerAdapter.addFragments(respirationFrag, "Respiration");
         viewPagerAdapter.addFragments(hydrateFrag, "Hydration");
 
-
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
         requestLocationPermissionIfNeeded();
@@ -251,13 +250,14 @@ public class GraphActivity extends BlunoLibrary {
                 @Override
                 public void run() {
 
-                    //respirationFrag = (RespirationFragment) viewPagerAdapter.getFragment(2);  //respiration fragment is at position 2 in hashmap
+                    /*respirationFrag = (RespirationFragment) viewPagerAdapter.getFragment(1);  //respiration fragment is at position 1 in hashmap
                     if (respirationFrag != null) {
                         respirationFrag.respDispMsg(Float.toString(breathsPerMin));
-                    }
-/*                    if (hydrateFrag != null) {
-                        hydrateFrag.hydrateDispMsg2("0");
                     }*/
+                    hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(2);  //hydration fragment is at position 2 in hashmap
+                    if (hydrateFrag != null) {
+                        hydrateFrag.hydrateDispMsg2("42");
+                    }
                 }
             });
 
@@ -269,9 +269,9 @@ public class GraphActivity extends BlunoLibrary {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run(){
-                    //hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(1); //is this needed?
+                    hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(2); //is this needed?
                     if (hydrateFrag != null){
-                        hydrateFrag.hydrateDispMsg2("0");
+                        hydrateFrag.hydrateDispMsg2("42");
                     }
                 }
             });

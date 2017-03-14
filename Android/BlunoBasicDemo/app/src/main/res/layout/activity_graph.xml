@@ -43,7 +43,13 @@
 
     <fragment android:name="com.dfrobot.angelo.blunobasicdemo.graphData.ConfigFragment"
         android:id="@+id/config_fragment"
-        android:layout_weight="2"
+        android:layout_weight="1"
+        android:layout_width= "0dp"
+        android:layout_height="match_parent" />
+
+    <fragment android:name="com.dfrobot.angelo.blunobasicdemo.graphData.RespirationFragment"
+        android:id="@+id/respiration_fragment"
+        android:layout_weight="1"
         android:layout_width= "0dp"
         android:layout_height="match_parent" />
 
