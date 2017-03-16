@@ -3,6 +3,7 @@ package com.dfrobot.angelo.blunobasicdemo.graphData;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +20,9 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
+import java.math.RoundingMode;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,6 +44,10 @@ public class RespirationFragment extends Fragment {
     private ArrayList<Entry> entries;
     private LineDataSet dataSet;
     IAxisValueFormatter xAxisFormatter;
+    private Bundle savedState = null;
+    DecimalFormat decFormat;
+    DateFormat dateForm;
+    ArrayList<DataTime> prevRespVals = new ArrayList<DataTime>();
 
     public RespirationFragment() {
         // Required empty public constructor
@@ -92,6 +99,19 @@ public class RespirationFragment extends Fragment {
         breathsPerMin = (TextView)rootView.findViewById(R.id.respRate);
         editText = (EditText)rootView.findViewById(R.id.Redit_message);
         initRPlot();
+
+        dateForm = new SimpleDateFormat("EEE, d MMM, HH:mm");    //for displaying vital reading
+         //round respiration rate to 2 decimal places for displaying purposes
+        decFormat = new DecimalFormat("##.##");
+        decFormat.setRoundingMode(RoundingMode.DOWN);
+
+        if(savedInstanceState != null && savedState == null) {
+            savedState = savedInstanceState.getBundle("respFragSavedState");
+        }
+        if(savedState != null) {
+           restoreData(savedState);
+        }
+        savedState = null;
         return rootView;
     }
 
@@ -123,12 +143,13 @@ public class RespirationFragment extends Fragment {
         long currTime = System.currentTimeMillis()/1000 -  referenceTimestamp;
         //String currMsg = breathsPerMin.getText().toString();
         try{
-
-            Float intRespRate = Float.parseFloat(data);
-            DateFormat df = new SimpleDateFormat("EEE, d MMM, HH:mm");
-            String mydate = df.format(Calendar.getInstance().getTime());
-            breathsPerMin.setText(intRespRate  + "% as of " + mydate);
-            addRPoint(currTime, intRespRate);
+            Float fRespRate = Float.parseFloat(data);
+            //DateFormat df = new SimpleDateFormat("EEE, d MMM, HH:mm");
+            String mydate = dateForm.format(Calendar.getInstance().getTime());  //format date
+            String vMsg = decFormat.format(fRespRate) + " BPM as of " + mydate; //round float to 2 decimal places
+            breathsPerMin.setText(vMsg);
+            prevRespVals.add(new DataTime(currTime, fRespRate,vMsg));//save data in ArrayList
+            addRPoint(currTime, fRespRate);
         }
         catch(NumberFormatException e){
             breathsPerMin.setText("Invalid entry");
@@ -138,6 +159,7 @@ public class RespirationFragment extends Fragment {
     /** Called when the user clicks the Send button. Must be public and void
      * Displays what the user entered into the edit_message widget
      * */
+    //TODO: REMOVE METHOD? IT'S ONLY USED FOR DEBUGGING
     public void respDispUserMsg(View view){
         String message = editText.getText().toString();
 
@@ -148,12 +170,34 @@ public class RespirationFragment extends Fragment {
             Integer intRespRate = Integer.parseInt(message);
             DateFormat df = new SimpleDateFormat("EEE, d MMM, HH:mm");
             String mydate = df.format(Calendar.getInstance().getTime());
-            breathsPerMin.setText(intRespRate  + "% as of " + mydate);
+            breathsPerMin.setText(intRespRate + " as of " + mydate);
             addRPoint(currTime, intRespRate);
         }
         catch(NumberFormatException e){
             breathsPerMin.setText("Invalid entry");
         }
+    }
+    private Bundle saveState() { /* called either from onDestroyView() or onSaveInstanceState() */
+        Bundle state = new Bundle();
+        state.putParcelableArrayList("pastRespData", prevRespVals);
+        return state;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        savedState = saveState(); /* vstup defined here for sure */
+        /*if (cTimer != null) //avoid memory leak
+            cTimer.cancel();*/
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        /* If onDestroyView() is called first, we can use the previously savedState but we can't call saveState() anymore */
+        /* If onSaveInstanceState() is called first, we don't have savedState, so we need to call saveState() */
+        /* => (?:) operator inevitable! */
+        outState.putBundle("respFragSavedState", (savedState != null) ? savedState : saveState());
     }
 
     @Override
@@ -165,6 +209,23 @@ public class RespirationFragment extends Fragment {
     public void onPause() {
         super.onPause();
     }
+
+    private void restoreData(Bundle savedData){
+        ArrayList<DataTime> prevResp  = savedData.getParcelableArrayList("pastRespData");
+        for (int i = 0; i < prevResp.size(); i++){
+            DataTime dt = prevResp.get(i);
+            addRPoint(dt.getCurrTime(), dt.getVitalVal());
+            if (i == prevResp.size() - 1){
+                //update the vital status message if it is the most recent message
+                breathsPerMin.setText(dt.getVitalMsg());
+            }
+        }
+    }
+
+/*    private void setVitalMsg(float fRespRate){
+        String mydate = dateForm.format(Calendar.getInstance().getTime());
+        breathsPerMin.setText(decFormat.format(fRespRate)  + "% as of " + mydate);
+    }*/
 
 
 }

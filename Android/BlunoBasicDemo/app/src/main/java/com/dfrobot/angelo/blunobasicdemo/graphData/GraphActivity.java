@@ -3,8 +3,6 @@ package com.dfrobot.angelo.blunobasicdemo.graphData;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -30,7 +28,8 @@ public class GraphActivity extends BlunoLibrary {
     HydrationFragment hydrateFrag;
     RespirationFragment respirationFrag;
     ConfigFragment configFrag;
-    //Button scanBtn;
+     //elements should be in the order that the fragments are added
+    public enum fragT {FRAG_RESP, FRAG_CONF, FRAG_HYDR}
 
     // hydration plot variables
     ArrayList<String> hXAXES = new ArrayList<String>();
@@ -45,6 +44,7 @@ public class GraphActivity extends BlunoLibrary {
     ArrayList<Float> rData = new ArrayList<Float>(maxSamples/2);
     private static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
     public enum measType {HYDRATION, RESPIRATION}
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +85,7 @@ public class GraphActivity extends BlunoLibrary {
         viewPagerAdapter.addFragments(hydrateFrag, "Hydration");
 
         viewPager.setAdapter(viewPagerAdapter);
-        viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(fragT.FRAG_CONF.ordinal());
         tabLayout.setupWithViewPager(viewPager);
         requestLocationPermissionIfNeeded();
     }
@@ -251,7 +251,7 @@ public class GraphActivity extends BlunoLibrary {
                 @Override
                 public void run() {
 
-                    respirationFrag = (RespirationFragment) viewPagerAdapter.getFragment(0);  //respiration fragment is at position 1 in hashmap
+                    respirationFrag = (RespirationFragment) viewPagerAdapter.getFragment(fragT.FRAG_RESP.ordinal());  //respiration fragment is at position 1 in hashmap
                     if (respirationFrag != null) {
                         respirationFrag.respDispMsg(Float.toString(breathsPerMin));
                     }
@@ -262,9 +262,7 @@ public class GraphActivity extends BlunoLibrary {
                 }
             });
             if (viewPager != null)
-                viewPager.setCurrentItem(0);
-
-            //setContentView(R.layout.g_fragment_respiration);
+                viewPager.setCurrentItem(fragT.FRAG_RESP.ordinal());
 
         }
         if (measType == measType.HYDRATION){ //TODO: IMPLEMENT RESPIRATION PROCESSING
@@ -272,14 +270,14 @@ public class GraphActivity extends BlunoLibrary {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run(){
-                    hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(2); //is this needed?
+                    hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(fragT.FRAG_HYDR.ordinal()); //is this needed?
                     if (hydrateFrag != null){
                         hydrateFrag.hydrateDispMsg2("42");
                     }
                 }
             });
             if (viewPager != null)
-                viewPager.setCurrentItem(2);
+                viewPager.setCurrentItem(fragT.FRAG_HYDR.ordinal());
 
 
         }
@@ -289,14 +287,6 @@ public class GraphActivity extends BlunoLibrary {
         rData.clear();
         samples.clear();
     }
-    //convert byte array to string
-/*    private String bytesToText(byte[] bytes, boolean simplifyNewLine) {
-        String text = new String(bytes, Charset.forName("UTF-8"));
-        if (simplifyNewLine) {
-            text = text.replaceAll("(\\r\\n|\\r)", "\n");
-        }
-        return text;
-    }*/
 
     @TargetApi(Build.VERSION_CODES.M)
     private void requestLocationPermissionIfNeeded() {

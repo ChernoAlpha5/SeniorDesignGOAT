@@ -38,6 +38,9 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         mFragmentManage = fm;
 
     }
+    public int getPosition(String fragName){
+        return tabTitles.indexOf(fragName);
+    }
     @Override
     public Fragment getItem(int position) {
         return fragments.get(position);

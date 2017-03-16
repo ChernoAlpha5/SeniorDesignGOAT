@@ -199,12 +199,11 @@ public class ConfigFragment extends Fragment {
                             loadStr = "";
                             dotInd = 0;
                         }
+                         //format center time text to mm:ss
                         String strSecs = secs + "";
                         if (secs < 10)
                             strSecs = "0" + secs;
 
-                        //timer.setText(mins + ":" + strSecs);
-                        //progressBar.setProgress(progressBar.getMax() - (int)(100* (float)millisUntilFinished / cTime));
                         currProg = 360 - 360 * ((float) millisUntilFinished / cTime);
                         progWheel.setProgress((int) (currProg + 0.5));   //round to nearest int
                         progWheel.setText(mins + ":" + strSecs);
@@ -252,7 +251,7 @@ public class ConfigFragment extends Fragment {
             wakeLock.release();
         }*/
     }
-
+     // save and restore fragment: http://stackoverflow.com/questions/15313598/once-for-all-how-to-correctly-save-instance-state-of-fragments-in-back-stack
     private Bundle saveState() { /* called either from onDestroyView() or onSaveInstanceState() */
         Bundle state = new Bundle();
         state.putString("measureBtnText", measureBtn.getText().toString());
@@ -265,14 +264,11 @@ public class ConfigFragment extends Fragment {
         super.onDestroyView();
         savedState = saveState(); /* vstup defined here for sure */
         measureBtn = null;
-        /*if (cTimer != null) //avoid memory leak
-            cTimer.cancel();*/
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        //outState.putString("measureBtnText", measureBtn.getText().toString());
         /* If onDestroyView() is called first, we can use the previously savedState but we can't call saveState() anymore */
         /* If onSaveInstanceState() is called first, we don't have savedState, so we need to call saveState() */
         /* => (?:) operator inevitable! */

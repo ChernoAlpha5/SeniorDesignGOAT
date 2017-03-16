@@ -21,22 +21,23 @@
             android:text="Send"
             android:layout_alignParentRight="true"
             android:layout_above="@id/title"/>
+
         <TextView
-            android:id = "@id/title"
+            android:id="@id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Current Breaths Per Min"
+            android:layout_above="@+id/respRate"
             android:gravity="center"
-            android:textSize = "25dp"
-            android:textStyle = "bold"
-            android:layout_above="@+id/respRate"/>
+            android:text="Breaths Per Min (BPM):"
+            android:textSize="25dp"
+            android:textStyle="bold" />
         <TextView
             android:id = "@id/respRate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="No Data"
             android:gravity="center"
-            android:textSize = "25dp"
+            android:textSize = "20dp"
             android:textStyle = "bold"
             android:layout_above="@+id/respChart"/>
 
