@@ -95,7 +95,6 @@ public class RespirationFragment extends Fragment {
         if (referenceTimestamp == -1){
             referenceTimestamp = System.currentTimeMillis()/1000;
         }
-        referenceTimestamp = System.currentTimeMillis()/1000;
         xAxisFormatter = new HourAxisValueFormatter(referenceTimestamp);
         xaxis.setValueFormatter(xAxisFormatter);
         respChart.setVisibleXRange(0, xAxisWindow);  //x axis is in seconds
