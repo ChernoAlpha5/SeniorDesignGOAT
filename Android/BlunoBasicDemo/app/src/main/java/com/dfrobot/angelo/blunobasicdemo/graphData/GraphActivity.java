@@ -45,6 +45,9 @@ public class GraphActivity extends BlunoLibrary {
     private static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
     public enum measType {HYDRATION, RESPIRATION}
 
+    //vars for debugging hydration fragment
+    int[] fakeHydrVals = {10, 40, 85, 100, 4};
+    int i = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,7 +192,7 @@ public class GraphActivity extends BlunoLibrary {
                         //String byteStr = new String(theString, "ASCII"); // for ASCII encoding
                         String s = theString.replaceAll("(\\r\\n|\\r)", "\n");
                         byte[] byteArr = s.getBytes();
-                        hydrateFrag.hydrateDispMsg2(bytesToText(byteArr, true));
+                        hydrateFrag.hydrateDispMsg(bytesToText(byteArr, true));
                     }
                 }
             });*/
@@ -257,7 +260,7 @@ public class GraphActivity extends BlunoLibrary {
                     }
                     /*hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(2);  //hydration fragment is at position 2 in hashmap
                     if (hydrateFrag != null) {
-                        hydrateFrag.hydrateDispMsg2("42");
+                        hydrateFrag.hydrateDispMsg("42");
                     }*/
                 }
             });
@@ -272,7 +275,9 @@ public class GraphActivity extends BlunoLibrary {
                 public void run(){
                     hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(fragT.FRAG_HYDR.ordinal()); //is this needed?
                     if (hydrateFrag != null){
-                        hydrateFrag.hydrateDispMsg2("42");
+                        //TODO: CURRENTLY DISPLAYS FAKE VALUES. CHANGE THIS!!!
+                        hydrateFrag.hydrateDispMsg(fakeHydrVals[i] + "");
+                        i = (i+1) % fakeHydrVals.length;
                     }
                 }
             });

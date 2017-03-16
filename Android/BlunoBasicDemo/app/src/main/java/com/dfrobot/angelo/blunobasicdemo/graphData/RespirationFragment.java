@@ -90,7 +90,11 @@ public class RespirationFragment extends Fragment {
         xaxis.setAxisMaximum(86400);  //set x axis maximum to number of seconds in a day
         xaxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xaxis.setTextSize(12f);
+
         //format the x axis to display time
+        if (referenceTimestamp == -1){
+            referenceTimestamp = System.currentTimeMillis()/1000;
+        }
         referenceTimestamp = System.currentTimeMillis()/1000;
         xAxisFormatter = new HourAxisValueFormatter(referenceTimestamp);
         xaxis.setValueFormatter(xAxisFormatter);
@@ -144,7 +148,6 @@ public class RespirationFragment extends Fragment {
         //String currMsg = breathsPerMin.getText().toString();
         try{
             Float fRespRate = Float.parseFloat(data);
-            //DateFormat df = new SimpleDateFormat("EEE, d MMM, HH:mm");
             String mydate = dateForm.format(Calendar.getInstance().getTime());  //format date
             String vMsg = decFormat.format(fRespRate) + " BPM as of " + mydate; //round float to 2 decimal places
             breathsPerMin.setText(vMsg);
@@ -177,6 +180,8 @@ public class RespirationFragment extends Fragment {
             breathsPerMin.setText("Invalid entry");
         }
     }
+
+     //methods below save/restore graph state of fragment
     private Bundle saveState() { /* called either from onDestroyView() or onSaveInstanceState() */
         Bundle state = new Bundle();
         state.putParcelableArrayList("pastRespData", prevRespVals);
@@ -200,16 +205,6 @@ public class RespirationFragment extends Fragment {
         outState.putBundle("respFragSavedState", (savedState != null) ? savedState : saveState());
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
     private void restoreData(Bundle savedData){
         ArrayList<DataTime> prevResp  = savedData.getParcelableArrayList("pastRespData");
         for (int i = 0; i < prevResp.size(); i++){
@@ -222,10 +217,14 @@ public class RespirationFragment extends Fragment {
         }
     }
 
-/*    private void setVitalMsg(float fRespRate){
-        String mydate = dateForm.format(Calendar.getInstance().getTime());
-        breathsPerMin.setText(decFormat.format(fRespRate)  + "% as of " + mydate);
-    }*/
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
 
 }
