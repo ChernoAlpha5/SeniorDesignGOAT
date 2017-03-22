@@ -27,7 +27,7 @@ public class ConfigFragment extends Fragment {
     View rootView;
     Spinner vitalSpinner, timeSpinner;
     //TextView timer;
-    TextView progMsg, loadingText;
+    TextView progMsg, loadingText, vitalDataText;
     CountDownTimer cTimer = null;
     //ProgressBar progressBar;
     //Snackbar mySnackbar;
@@ -50,6 +50,8 @@ public class ConfigFragment extends Fragment {
 
         progMsg = (TextView)rootView.findViewById(R.id.progMsg);
         loadingText = (TextView)rootView.findViewById(R.id.loadingText);
+        vitalDataText = (TextView)rootView.findViewById(R.id.vitalDataText);
+
         measureBtn = (Button)rootView.findViewById(R.id.measureBtn);
 
         measureBtn.setOnClickListener(new View.OnClickListener() {
@@ -65,6 +67,8 @@ public class ConfigFragment extends Fragment {
                     /*if (wakeLock != null)
                         wakeLock.release();*/
                             progMsg.setText("Cancelled");
+                            vitalDataText.setTextSize(35);
+                            vitalDataText.setText("No Data");
                             loadingText.setText("");
                             ((GraphActivity) getActivity()).sendToBluno("c");   //tell Bluno to cancel measurements
                             ((GraphActivity) getActivity()).clearData();
@@ -119,10 +123,8 @@ public class ConfigFragment extends Fragment {
                     //setContentView(R.layout.activity_graph);
 
                 }
-
             }
         });
-
 
        // mySnackbar = Snackbar.make(rootView, R.string.connect_first, Snackbar.LENGTH_SHORT);
         progWheel = (ProgressWheel) rootView.findViewById(R.id.pw_spinner);
@@ -172,11 +174,13 @@ public class ConfigFragment extends Fragment {
 
                 if (vitalSpinner.getSelectedItem().toString().equals("Respiration")) {
                     ((GraphActivity) getActivity()).sendToBluno("r" + cTime / 1000);   //tell Bluno how long we are sampling for in seconds
-                    mType = measType.RESPIRATION;
+                    //mType = measType.RESPIRATION;
+                    ((GraphActivity) getActivity()).setMeasType(measType.RESPIRATION);
                     progMsgStr = "Measuring Respiration";
                 } else {
                     ((GraphActivity) getActivity()).sendToBluno("h" + cTime / 1000);   //tell Bluno how long we are sampling for in seconds
-                    mType = measType.HYDRATION;
+                    //mType = measType.HYDRATION;
+                    ((GraphActivity) getActivity()).setMeasType(measType.HYDRATION);
                     progMsgStr = "Measuring Hydration";
                 }
                 progMsg.setText(progMsgStr);
@@ -199,6 +203,26 @@ public class ConfigFragment extends Fragment {
                             loadStr = "";
                             dotInd = 0;
                         }
+
+                        //update respiration textview that displays beats per min
+                        if (((GraphActivity) getActivity()).getMeasType() == measType.RESPIRATION){
+                            String currData =  ((GraphActivity) getActivity()).getBPM() + "";
+                            if (((GraphActivity) getActivity()).dataBad()){ //account for abnormal readings
+                                vitalDataText.setTextSize(20);
+                                vitalDataText.setText("Abnormal readings. No finger?");
+                            }
+                            else{
+                                vitalDataText.setTextSize(35);
+                                vitalDataText.setText(currData + " BPM");
+                            }
+
+                        }
+                        //update hydration textview that displays voltages
+                        if (((GraphActivity) getActivity()).getMeasType() == measType.HYDRATION){
+                            // TODO: 3/21/2017 IMPLEMENT HYDRATION UPDATING TEXTVIEW
+                            vitalDataText.setText("TODO");
+                        }
+
                          //format center time text to mm:ss
                         String strSecs = secs + "";
                         if (secs < 10)
@@ -211,13 +235,14 @@ public class ConfigFragment extends Fragment {
 
                     public void onFinish() {
                         measureBtn.setText("measure");
+                        vitalDataText.setText("No Data");
                         //progressBar.setProgress(progressBar.getMax());
                         progWheel.setProgress(360);
                         progWheel.setText("0:00");
                         progMsg.setText("Done!");
                         loadingText.setText("");
                         runCounter = 0;
-                        ((GraphActivity) getActivity()).processData(mType, (int) (cTime / 1000));
+                        ((GraphActivity) getActivity()).graphData((int) (cTime / 1000));
                         /*if (wakeLock != null)
                             wakeLock.release();*/
                     }

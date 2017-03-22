@@ -28,6 +28,7 @@ public class GraphActivity extends BlunoLibrary {
     HydrationFragment hydrateFrag;
     RespirationFragment respirationFrag;
     ConfigFragment configFrag;
+    boolean badData = false;
      //elements should be in the order that the fragments are added
     public enum fragT {FRAG_RESP, FRAG_CONF, FRAG_HYDR}
 
@@ -37,11 +38,13 @@ public class GraphActivity extends BlunoLibrary {
     double startTime = 0;
 
     //data collection variables
+    measType mType = null;
     int numSamples = 0;
     int maxSamples = 4000;
     int threshold = 1000; //minimum PPG data value. Anything lower than this is discarded
-    ArrayList<String> samples = new ArrayList<String>(maxSamples/2);
-    ArrayList<Float> rData = new ArrayList<Float>(maxSamples/2);
+    ArrayList<Float> IRsamples = new ArrayList<Float>(maxSamples/2);
+    ArrayList<Float> BPMdata = new ArrayList<Float>(maxSamples/2);
+    //ArrayList<Float> rData = new ArrayList<Float>(maxSamples/2);
     private static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
     public enum measType {HYDRATION, RESPIRATION}
 
@@ -134,7 +137,6 @@ public class GraphActivity extends BlunoLibrary {
             getSupportFragmentManager().putFragment(outState, "savedConfigFragment", configFrag);
     }
 
-
     @Override
     public void onConectionStateChange(connectionStateEnum theConnectionState) {//Once connection state changes, this function will be called
         String connectionState = null;
@@ -171,34 +173,57 @@ public class GraphActivity extends BlunoLibrary {
         buttonScanOnClickProcess();
     }
 
+    public void setMeasType(measType m){mType = m;}
+
+    public measType getMeasType(){return mType;}
+
+    //returns the most recent BPM in BPMdata array
+    public float getBPM(){
+        if (BPMdata.size() > 0){
+           return BPMdata.get(BPMdata.size() - 1);
+        }
+        return 0;
+    }
+
+     //returns the most recent IR data in IR array
+    public float getIR(){
+        if (IRsamples.size() > 0){
+            return IRsamples.get(IRsamples.size() - 1);
+        }
+        return 0;
+    }
+
+    public boolean dataBad(){
+        return badData;
+    }
+
     @Override
     public void onSerialReceived(final String theString) {//Once connection data received, this function will be called
-
-        if (samples.size() <  maxSamples ){
-            samples.add(theString);
-        }
-/*        else {
-            int numErrors = processData(samples);
-            System.out.println("Samples correct? " + numErrors);
-        }*/
-
-            /*runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    //hydrateFrag = (HydrationFragment) getSupportFragmentManager().findFragmentById(R.id.hydration_fragment);
-                    hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(1);  //is 0 the position in the hashmap??
-                    if (hydrateFrag != null) {
-                        //String byteStr = "";
-                        //String byteStr = new String(theString, "ASCII"); // for ASCII encoding
-                        String s = theString.replaceAll("(\\r\\n|\\r)", "\n");
-                        byte[] byteArr = s.getBytes();
-                        hydrateFrag.hydrateDispMsg(bytesToText(byteArr, true));
+        if (IRsamples.size() <  maxSamples ){
+            String data = theString.replaceAll("\\r\\n", "");
+            if (mType == measType.RESPIRATION){
+                try {
+                    String[] splitDat = data.split(" "); //string format: "BPM rawIRdata"
+                    if (splitDat.length == 2){
+                        Float BPM = Float.parseFloat(splitDat[0]);
+                        Float IRdata = Float.parseFloat(splitDat[1]);
+                        //check if values are in correct range
+                        if (BPM > 20 && BPM < 220)
+                            BPMdata.add(BPM);
+                        if (IRdata > 1000 && IRdata < 1000000)
+                            IRsamples.add(IRdata);
+                        badData = (IRdata < 1000 || IRdata > 1000000);
                     }
                 }
-            });*/
+                catch(NumberFormatException e){  //if the number is not a valid float
+                    //e.printStackTrace();
+                }
+            }
+            if (mType == measType.HYDRATION){
+                //// TODO: 3/21/2017 implement hydration onSerialReceive
+            }
 
-        //}
-
+        }
     }
     //send the data to the BLUNO
     public void sendToBluno(String text){serialSend(text);}
@@ -207,13 +232,13 @@ public class GraphActivity extends BlunoLibrary {
         return mConnectionState;
     }
 
-    public void processData(measType measType, int seconds){
+    public void graphData(int seconds){
 
-        if (measType == measType.RESPIRATION){
-            filterData fData = new filterData();
+        if (mType == measType.RESPIRATION){
+            /*
             //format data to remove \\r\\n characters and discard any data less than <threshold>
-            for (int i = 1; i < samples.size(); i++){  //ensure no newline characters in string
-                String s = samples.get(i);
+            for (int i = 1; i < IRsamples.size(); i++){  //ensure no newline characters in string
+                String s = IRsamples.get(i);
                 char delineator = '\r';
                 //int index = s.indexOf(delineator);
                 //data error - sometimes there are 2+ datas per entry in data ArrayList
@@ -225,27 +250,28 @@ public class GraphActivity extends BlunoLibrary {
                         for (int x = 0; x < sArr.length; x ++) {
                             Float f = Float.parseFloat(sArr[x]);
                             if (f >= threshold){
-                                rData.add(/*currInd,*/ f);
+                                rData.add(*//*currInd,*//* f);
                                 currInd++;
                             }
                         }
                         i = currInd -1; //update index after inserting data
                     }
                     else{
-                        Float f = Float.parseFloat(samples.get(i).replaceAll("\\r\\n", ""));
+                        Float f = Float.parseFloat(IRsamples.get(i).replaceAll("\\r\\n", ""));
                         if (f >= threshold){
                             rData.add(f);
                         }
                     }
                 }
                 catch(NumberFormatException e){e.printStackTrace();}    //in case the number is not a valid float
-            }
+            }*/
+            filterData fData = new filterData();
             int breaths = 0;
-            if (rData.size() > 0)
-                breaths = fData.calculateRespRate(rData);
+            if (IRsamples.size() > 0)
+                breaths = fData.calculateRespRate(IRsamples);
 
-            rData.clear();
-            samples.clear();
+            clearData();
+
             final float breathsPerMin = breaths/((float)seconds/60);
             System.out.println(breathsPerMin);     //calculate breaths per minute
 
@@ -268,7 +294,7 @@ public class GraphActivity extends BlunoLibrary {
                 viewPager.setCurrentItem(fragT.FRAG_RESP.ordinal());
 
         }
-        if (measType == measType.HYDRATION){ //TODO: IMPLEMENT RESPIRATION PROCESSING
+        if (mType == measType.HYDRATION){ //TODO: IMPLEMENT RESPIRATION PROCESSING
             //graph filtered result on hydration graph
             runOnUiThread(new Runnable() {
                 @Override
@@ -289,8 +315,9 @@ public class GraphActivity extends BlunoLibrary {
     }
 
     public void clearData(){
-        rData.clear();
-        samples.clear();
+        //rData.clear();
+        BPMdata.clear();
+        IRsamples.clear();
     }
 
     @TargetApi(Build.VERSION_CODES.M)
