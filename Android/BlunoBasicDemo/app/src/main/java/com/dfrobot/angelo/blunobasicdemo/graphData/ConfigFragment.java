@@ -17,6 +17,9 @@ import com.dfrobot.angelo.blunobasicdemo.graphData.GraphActivity.measType;
 import com.dfrobot.angelo.blunobasicdemo.R;
 import com.todddavies.components.progressbar.ProgressWheel;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+
 /**
  * Created by Andrew on 2/19/2017.
  */
@@ -37,14 +40,14 @@ public class ConfigFragment extends Fragment {
     //WakeLock wakeLock;
     int runCounter = 0; //if run counter = 0 (when entering section) run counter, else wait
     private Handler mHandler = new Handler();
+    DecimalFormat voltFormat;
 
     public ConfigFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         rootView = inflater.inflate(R.layout.g_fragment_config, container, false);
 
@@ -57,6 +60,9 @@ public class ConfigFragment extends Fragment {
         measureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                voltFormat = new DecimalFormat("##.##");
+                voltFormat.setRoundingMode(RoundingMode.DOWN);
+
                 if (!(((GraphActivity) getActivity()).getConnectionState() == BlunoLibrary.connectionStateEnum.isConnected)) {
                     ((GraphActivity) getActivity()).scanDevices(v);
                 }
@@ -220,7 +226,8 @@ public class ConfigFragment extends Fragment {
                         //update hydration textview that displays voltages
                         if (((GraphActivity) getActivity()).getMeasType() == measType.HYDRATION){
                             // TODO: 3/21/2017 IMPLEMENT HYDRATION UPDATING TEXTVIEW
-                            vitalDataText.setText("TODO");
+                            float hydrVolt = ((GraphActivity) getActivity()).getHydr();
+                            vitalDataText.setText(voltFormat.format(hydrVolt) + " V");
                         }
 
                          //format center time text to mm:ss

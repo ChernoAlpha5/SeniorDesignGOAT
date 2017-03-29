@@ -44,6 +44,7 @@ public class GraphActivity extends BlunoLibrary {
     int threshold = 1000; //minimum PPG data value. Anything lower than this is discarded
     ArrayList<Float> IRsamples = new ArrayList<Float>(maxSamples/2);
     ArrayList<Float> BPMdata = new ArrayList<Float>(maxSamples/2);
+    ArrayList<Float> hydrSamples = new ArrayList<Float>(maxSamples/2);
     //ArrayList<Float> rData = new ArrayList<Float>(maxSamples/2);
     private static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
     public enum measType {HYDRATION, RESPIRATION}
@@ -193,6 +194,14 @@ public class GraphActivity extends BlunoLibrary {
         return 0;
     }
 
+    //returns the most recent hydration data in hydr array
+    public float getHydr(){
+        if (hydrSamples.size() > 0){
+            return hydrSamples.get(hydrSamples.size() - 1);
+        }
+        return 0;
+    }
+
     public boolean dataBad(){
         return badData;
     }
@@ -221,6 +230,16 @@ public class GraphActivity extends BlunoLibrary {
             }
             if (mType == measType.HYDRATION){
                 //// TODO: 3/21/2017 implement hydration onSerialReceive
+                try{
+                     //convert ADC value (Uno has 10 bit resolution, so value between 0 - 1023) to voltage between 0 - 5V
+                    float ADCval = Float.parseFloat(data);
+                    ADCval *= (5.0 / 1023.0);
+                    hydrSamples.add(ADCval);
+                }
+                catch(NumberFormatException e) {
+                    e.printStackTrace();
+                }
+
             }
 
         }
@@ -301,9 +320,19 @@ public class GraphActivity extends BlunoLibrary {
                 public void run(){
                     hydrateFrag = (HydrationFragment) viewPagerAdapter.getFragment(fragT.FRAG_HYDR.ordinal()); //is this needed?
                     if (hydrateFrag != null){
-                        //TODO: CURRENTLY DISPLAYS FAKE VALUES. CHANGE THIS!!!
+                        //average values in hydration sample array
+                        float sum = 0;
+                        if(!hydrSamples.isEmpty()) {
+                            for (float f : hydrSamples) {
+                                sum += f;
+                            }
+                            hydrateFrag.hydrateDispMsg(sum/hydrSamples.size() + "");
+                        }
+                        else
+                            hydrateFrag.hydrateDispMsg("0");
+                        /*//TODO: CURRENTLY DISPLAYS FAKE VALUES. CHANGE THIS!!!
                         hydrateFrag.hydrateDispMsg(fakeHydrVals[i] + "");
-                        i = (i+1) % fakeHydrVals.length;
+                        i = (i+1) % fakeHydrVals.length;*/
                     }
                 }
             });
@@ -318,6 +347,7 @@ public class GraphActivity extends BlunoLibrary {
         //rData.clear();
         BPMdata.clear();
         IRsamples.clear();
+        hydrSamples.clear();
     }
 
     @TargetApi(Build.VERSION_CODES.M)
