@@ -42,9 +42,7 @@ public class ConfigFragment extends Fragment {
     private Handler mHandler = new Handler();
     DecimalFormat voltFormat;
 
-    public ConfigFragment() {
-        // Required empty public constructor
-    }
+    public ConfigFragment() {} // Required empty public constructor
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -260,7 +258,6 @@ public class ConfigFragment extends Fragment {
  /*       else{ //display error message telling user to connect before measuring
             mySnackbar.show();
         }*/
-
     }
 
     @Override

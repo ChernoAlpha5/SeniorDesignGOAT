@@ -438,7 +438,10 @@ public abstract  class BlunoLibrary  extends AppCompatActivity{
 				@Override
 				public void run() {
 					System.out.println("mLeScanCallback onLeScan run ");
-					mLeDeviceListAdapter.addDevice(device);
+                    final String deviceName = device.getName();
+                    if (deviceName != null && deviceName.equals("Bluno"))
+					    mLeDeviceListAdapter.addDevice(device);
+
 					mLeDeviceListAdapter.notifyDataSetChanged();
 				}
 			});
@@ -565,12 +568,16 @@ public abstract  class BlunoLibrary  extends AppCompatActivity{
 
 			BluetoothDevice device = mLeDevices.get(i);
 			final String deviceName = device.getName();
-			if (deviceName != null && deviceName.length() > 0)
+            if (deviceName != null && deviceName.equals("Bluno")){
+                viewHolder.deviceName.setText(deviceName);
+                viewHolder.deviceAddress.setText(device.getAddress());
+            }
+
+			/*if (deviceName != null && deviceName.length() > 0)
 				viewHolder.deviceName.setText(deviceName);
 			else
 				viewHolder.deviceName.setText(R.string.unknown_device);
-			viewHolder.deviceAddress.setText(device.getAddress());
-
+			viewHolder.deviceAddress.setText(device.getAddress());*/
 			return view;
 		}
 	}
