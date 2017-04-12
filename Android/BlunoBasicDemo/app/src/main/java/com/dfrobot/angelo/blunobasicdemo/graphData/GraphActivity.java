@@ -142,7 +142,6 @@ public class GraphActivity extends BlunoLibrary {
     public void onConectionStateChange(connectionStateEnum theConnectionState) {//Once connection state changes, this function will be called
         String connectionState = null;
         switch (theConnectionState) {											//Four connection state
-
             case isConnected:
                 connectionState = "Measure";
                 configFrag.setProgMsg("Tap Measure to Proceed");
@@ -172,6 +171,7 @@ public class GraphActivity extends BlunoLibrary {
     }
     public void scanDevices(View v){
         buttonScanOnClickProcess();
+
     }
 
     public void setMeasType(measType m){mType = m;}

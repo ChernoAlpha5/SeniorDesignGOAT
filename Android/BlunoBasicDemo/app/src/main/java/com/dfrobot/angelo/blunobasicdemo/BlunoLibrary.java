@@ -2,7 +2,13 @@ package com.dfrobot.angelo.blunobasicdemo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.annotation.SuppressLint;
@@ -134,7 +140,7 @@ public abstract  class BlunoLibrary  extends AppCompatActivity{
 			@Override
 			public void onClick(DialogInterface dialog, int which)
 			{
-				final BluetoothDevice device = mLeDeviceListAdapter.getDevice(which);
+				final BluetoothDevice device = mLeDeviceListAdapter.getDevice(which);	//UBER IMPORTANT!!!
 				if (device == null)
 					return;
 				scanLeDevice(false);
@@ -182,9 +188,7 @@ public abstract  class BlunoLibrary  extends AppCompatActivity{
 		}).create();
 		
     }
-    
-    
-    
+
     public void onResumeProcess() {
     	System.out.println("BlUNOActivity onResume");
 		// Ensures Bluetooth is enabled on the device. If Bluetooth is not
@@ -203,7 +207,6 @@ public abstract  class BlunoLibrary  extends AppCompatActivity{
 	    mainContext.registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
 
 	}
-    
 
     public void onPauseProcess() {
     	System.out.println("BLUNOActivity onPause");
@@ -341,20 +344,35 @@ public abstract  class BlunoLibrary  extends AppCompatActivity{
         }
     };
 	
-    public void buttonScanOnClickProcess()
-    {
+    public void buttonScanOnClickProcess() {
+        //set timeout for 3 seconds when scanning
+        CountDownTimer BTtimeOut = new CountDownTimer(3000,1000){
+            @Override
+            public void onTick(long l) {/*do nothing*/}
+            @Override
+            public void onFinish() {
+                if (mConnectionState == connectionStateEnum.isScanning)
+                    connectFail();
+
+            }
+        };
     	switch (mConnectionState) {
+
 		case isNull:
 			mConnectionState=connectionStateEnum.isScanning;
 			onConectionStateChange(mConnectionState);
 			scanLeDevice(true);
-			mScanDeviceDialog.show();
+            BTtimeOut.start();
+            //mScanDeviceDialog.show();
+            //connect();
 			break;
 		case isToScan:
 			mConnectionState=connectionStateEnum.isScanning;
 			onConectionStateChange(mConnectionState);
 			scanLeDevice(true);
-			mScanDeviceDialog.show();
+            BTtimeOut.start();
+			//mScanDeviceDialog.show();
+            //connect();
 			break;
 		case isScanning:
 			
@@ -372,14 +390,11 @@ public abstract  class BlunoLibrary  extends AppCompatActivity{
 			onConectionStateChange(mConnectionState);
 			break;
 		case isDisconnecting:
-			
 			break;
 
 		default:
 			break;
 		}
-    	
-    	
     }
     
 	void scanLeDevice(final boolean enable) {
@@ -432,16 +447,52 @@ public abstract  class BlunoLibrary  extends AppCompatActivity{
 	private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 
 		@Override
-		public void onLeScan(final BluetoothDevice device, int rssi,
-				byte[] scanRecord) {
-			((Activity) mainContext).runOnUiThread(new Runnable() {
+		public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
+
+           /* new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println("mLeScanCallback onLeScan run ");
+                    final String deviceName = device.getName();
+                    if (deviceName != null && deviceName.equals("HydrRespDevT12")){
+                        mLeDeviceListAdapter.addDevice(device);
+                    }
+                    mLeDeviceListAdapter.notifyDataSetChanged();
+                }
+
+            }).start();*/
+            /*ExecutorService executorService = Executors.newSingleThreadExecutor();
+            Future future = executorService.submit(new Runnable() {
+                public void run() {
+                    System.out.println("mLeScanCallback onLeScan run ");
+                    final String deviceName = device.getName();
+                    if (deviceName != null && deviceName.equals("HydrRespDevT12")){
+                        mLeDeviceListAdapter.addDevice(device);
+                        connect();  //connect to wearable device
+                    }
+                    mLeDeviceListAdapter.notifyDataSetChanged();
+                }
+            });
+            try {
+                future.get(3, TimeUnit.SECONDS);  //kill the thread in 3 seconds if it hasn't finished executing.
+            } catch (Exception e) {
+                future.cancel(true);
+                connectFail();  //connect to device
+                //e.printStackTrace();
+            }
+            finally {
+                executorService.shutdownNow();
+            }*/
+
+            ((Activity) mainContext).runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					System.out.println("mLeScanCallback onLeScan run ");
                     final String deviceName = device.getName();
-                    if (deviceName != null && deviceName.equals("Bluno"))
-					    mLeDeviceListAdapter.addDevice(device);
-
+                    if (deviceName != null && deviceName.equals("HydrRespDevT12")){
+						mLeDeviceListAdapter.addDevice(device);
+                        connect();  //connect to hydratio monitor
+					}
 					mLeDeviceListAdapter.notifyDataSetChanged();
 				}
 			});
@@ -527,6 +578,8 @@ public abstract  class BlunoLibrary  extends AppCompatActivity{
 		}
 
 		public BluetoothDevice getDevice(int position) {
+			if (mLeDevices.size() == 0)
+				return null;
 			return mLeDevices.get(position);
 		}
 
@@ -568,17 +621,55 @@ public abstract  class BlunoLibrary  extends AppCompatActivity{
 
 			BluetoothDevice device = mLeDevices.get(i);
 			final String deviceName = device.getName();
-            if (deviceName != null && deviceName.equals("Bluno")){
+/*            if (deviceName != null && deviceName.equals("HydrRespDevT12")){
                 viewHolder.deviceName.setText(deviceName);
                 viewHolder.deviceAddress.setText(device.getAddress());
-            }
+            }*/
 
-			/*if (deviceName != null && deviceName.length() > 0)
+			if (deviceName != null && deviceName.length() > 0)
 				viewHolder.deviceName.setText(deviceName);
 			else
 				viewHolder.deviceName.setText(R.string.unknown_device);
-			viewHolder.deviceAddress.setText(device.getAddress());*/
+			viewHolder.deviceAddress.setText(device.getAddress());
 			return view;
 		}
 	}
+	 //function is called when BT scan times out
+	public void connectFail(){
+        scanLeDevice(false);
+        mConnectionState = connectionStateEnum.isToScan;
+        onConectionStateChange(mConnectionState);
+        //TODO: display snackbar
+    }
+    public void connect() {
+		//while (mLeDeviceListAdapter.getDevice(0) == null){};
+        final BluetoothDevice device = mLeDeviceListAdapter.getDevice(0);    //UBER IMPORTANT!!!
+        if (device == null)
+            return;
+        scanLeDevice(false);
+
+        if (device.getName() == null || device.getAddress() == null) {
+            mConnectionState = connectionStateEnum.isToScan;
+            onConectionStateChange(mConnectionState);
+        } else {
+
+            System.out.println("onListItemClick " + device.getName().toString());
+
+            System.out.println("Device Name:" + device.getName() + "   " + "Device Name:" + device.getAddress());
+
+            mDeviceName = device.getName().toString();
+            mDeviceAddress = device.getAddress().toString();
+
+            if (mBluetoothLeService.connect(mDeviceAddress)) {
+                Log.d(TAG, "Connect request success");
+                mConnectionState = connectionStateEnum.isConnecting;
+                onConectionStateChange(mConnectionState);
+                mHandler.postDelayed(mConnectingOverTimeRunnable, 10000);
+            } else {
+                Log.d(TAG, "Connect request fail");
+                mConnectionState = connectionStateEnum.isToScan;
+                onConectionStateChange(mConnectionState);
+            }
+        }
+    }
 }
