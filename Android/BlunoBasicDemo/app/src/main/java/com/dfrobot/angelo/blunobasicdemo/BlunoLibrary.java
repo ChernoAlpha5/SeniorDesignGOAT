@@ -345,8 +345,8 @@ public abstract  class BlunoLibrary  extends AppCompatActivity{
     };
 	
     public void buttonScanOnClickProcess() {
-        //set timeout for 3 seconds when scanning
-        CountDownTimer BTtimeOut = new CountDownTimer(3000,1000){
+        //set timeout for 3 seconds when scanning, onTick is called every 1 second
+        CountDownTimer BTtimeOut = new CountDownTimer(10000,1000){
             @Override
             public void onTick(long l) {/*do nothing*/}
             @Override
