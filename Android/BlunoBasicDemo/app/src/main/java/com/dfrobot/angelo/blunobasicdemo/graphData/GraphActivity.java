@@ -47,7 +47,7 @@ public class GraphActivity extends BlunoLibrary {
     ArrayList<Float> hydrSamples = new ArrayList<Float>(maxSamples/2);
     //ArrayList<Float> rData = new ArrayList<Float>(maxSamples/2);
     private static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
-    public enum measType {HYDRATION, RESPIRATION}
+    public enum measType {HYDRATION, RESPIRATION, RESP_DEMO}
 
     //vars for debugging hydration fragment
     int[] fakeHydrVals = {10, 40, 85, 100, 4};
@@ -240,6 +240,15 @@ public class GraphActivity extends BlunoLibrary {
                     e.printStackTrace();
                 }
 
+            }
+            if (mType == measType.RESP_DEMO) {
+                try{ //don't check for correct range, just take in raw IR vals
+                    Float IRdata = Float.parseFloat(data);
+                    IRsamples.add(IRdata);
+                }
+                catch(NumberFormatException e) {
+                    e.printStackTrace();
+                }
             }
 
         }

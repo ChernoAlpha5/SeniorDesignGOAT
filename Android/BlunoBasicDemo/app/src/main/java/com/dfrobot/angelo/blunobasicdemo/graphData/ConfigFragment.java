@@ -170,7 +170,7 @@ public class ConfigFragment extends Fragment {
                 runCounter++;
                 measureBtn.setText("cancel");
                 String progMsgStr;
-                final int cntInterval = 300;
+                final int cntInterval = 200;
                 final measType mType;
                 // convert spinner value (string) to milliseconds
                 String[] minSec = timeSpinner.getSelectedItem().toString().split(":"); //format: "mm:ss" - separate minutes and seconds
@@ -181,11 +181,16 @@ public class ConfigFragment extends Fragment {
                     //mType = measType.RESPIRATION;
                     ((GraphActivity) getActivity()).setMeasType(measType.RESPIRATION);
                     progMsgStr = "Measuring Respiration";
-                } else {
+                } else if (vitalSpinner.getSelectedItem().toString().equals("Hydration")) {
                     ((GraphActivity) getActivity()).sendToBluno("h" + cTime / 1000);   //tell Bluno how long we are sampling for in seconds
                     //mType = measType.HYDRATION;
                     ((GraphActivity) getActivity()).setMeasType(measType.HYDRATION);
                     progMsgStr = "Measuring Hydration";
+                }
+                else{
+                    ((GraphActivity) getActivity()).sendToBluno("d" + cTime / 1000);   //tell Bluno how long we are sampling for in seconds
+                    ((GraphActivity) getActivity()).setMeasType(measType.RESP_DEMO);
+                    progMsgStr = "Reading Resp Values";
                 }
                 progMsg.setText(progMsgStr);
                 cTimer = new CountDownTimer(cTime, cntInterval) { //1st arg: time length in ms, 2nd arg: interval to call onTick()
@@ -223,9 +228,14 @@ public class ConfigFragment extends Fragment {
                         }
                         //update hydration textview that displays voltages
                         if (((GraphActivity) getActivity()).getMeasType() == measType.HYDRATION){
-                            // TODO: 3/21/2017 IMPLEMENT HYDRATION UPDATING TEXTVIEW
                             float hydrVolt = ((GraphActivity) getActivity()).getHydr();
                             vitalDataText.setText(voltFormat.format(hydrVolt) + " V");
+                        }
+
+                        //update readout that displays raw IR readings
+                        if (((GraphActivity) getActivity()).getMeasType() == measType.RESP_DEMO){
+                            int IRval = (int)((GraphActivity) getActivity()).getIR();
+                            vitalDataText.setText(IRval + "");
                         }
 
                          //format center time text to mm:ss

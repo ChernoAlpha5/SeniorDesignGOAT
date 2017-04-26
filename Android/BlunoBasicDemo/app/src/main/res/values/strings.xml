@@ -24,11 +24,12 @@
     <string-array name="vitals_arr">
         <item>Respiration</item>
         <item>Hydration</item>
+        <item>Resp Demo</item>
     </string-array>
 
     <string name = "connect_first">"Error: please connect to Bluno before measuring</string>
     <string-array name="time_arr">
-        <item>0:08</item>
+        <item>0:10</item>
         <item>2:00</item>
         <item>2:15</item>
         <item>2:30</item>
